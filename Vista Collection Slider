@@ -1,0 +1,896 @@
+{%- comment -%}
+  Section: Advanced Custom Category Slider / Grid
+  Description: Highly customizable category section with independent sliders and inline header links.
+{%- endcomment -%}
+
+{%- style -%}
+  /* Section Padding & General Settings */
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    background-color: {{ section.settings.section_bg_color }};
+    overflow: hidden;
+  }
+  
+  @media screen and (min-width: 768px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .adv-cat-container-{{ section.id }} {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+  }
+
+  @media screen and (max-width: 767px) {
+    .adv-cat-container-{{ section.id }} {
+      padding: 0 15px;
+    }
+  }
+
+  /* Header Typography & Alignment */
+  .adv-cat-header-wrapper-{{ section.id }} {
+    display: flex;
+    align-items: baseline; /* Keeps text aligned at the bottom */
+    gap: 16px;
+    margin-bottom: {{ section.settings.title_margin_bottom }}px;
+    justify-content: {{ section.settings.title_alignment }};
+    flex-wrap: wrap; /* Helps on very small mobile screens */
+  }
+
+  .adv-cat-header-{{ section.id }} h2 {
+    font-size: {{ section.settings.title_size_mobile }}px;
+    color: {{ section.settings.heading_color }};
+    font-weight: {{ section.settings.title_weight }};
+    margin: 0;
+    line-height: 1.2;
+    text-transform: {{ section.settings.title_transform }};
+  }
+
+  .adv-cat-action-link-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ section.settings.heading_color }};
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .adv-cat-action-link-{{ section.id }}:hover {
+    opacity: 1;
+  }
+
+  .adv-cat-action-link-{{ section.id }} svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .adv-cat-header-{{ section.id }} h2 {
+      font-size: {{ section.settings.title_size_desktop }}px;
+    }
+    .adv-cat-action-link-{{ section.id }} {
+      font-size: 15px;
+    }
+  }
+
+  /* Layout Wrapper */
+  .adv-cat-wrapper-{{ section.id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Track / Grid Layout */
+  .adv-cat-track-{{ section.id }} {
+    display: flex;
+    gap: {{ section.settings.gap_mobile }}px;
+    width: 100%;
+  }
+
+  /* SLIDER MODE */
+  .adv-cat-layout-slider .adv-cat-track-{{ section.id }} {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding-bottom: 10px; /* Space for hover effects */
+  }
+
+  .adv-cat-layout-slider .adv-cat-track-{{ section.id }}::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  /* GRID MODE */
+  .adv-cat-layout-grid .adv-cat-track-{{ section.id }} {
+    flex-wrap: wrap;
+  }
+
+  /* Item Width Calculations based on mode */
+  .adv-cat-item-{{ section.id }} {
+    text-decoration: none !important;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  /* Grid specific sizing */
+  .adv-cat-layout-grid .adv-cat-item-{{ section.id }} {
+    width: calc((100% - ({{ section.settings.desktop_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.desktop_items }});
+  }
+  
+  /* Slider specific sizing */
+  .adv-cat-layout-slider .adv-cat-item-{{ section.id }} {
+    flex: 0 0 calc((100% - ({{ section.settings.desktop_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.desktop_items }});
+  }
+
+  /* Card UI (Image Box) */
+  .adv-cat-image-box-{{ section.id }} {
+    background-color: {{ section.settings.card_bg_color }};
+    border-radius: {{ section.settings.card_border_radius }}px;
+    padding: {{ section.settings.card_padding }}px;
+    aspect-ratio: {{ section.settings.image_aspect_ratio }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: {{ section.settings.text_margin_top }}px;
+    transition: all 0.3s ease;
+    border: 1px solid {{ section.settings.card_border_color }};
+  }
+
+  {% if section.settings.hover_effect == 'lift' %}
+  .adv-cat-item-{{ section.id }}:hover .adv-cat-image-box-{{ section.id }} {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  {% elsif section.settings.hover_effect == 'zoom' %}
+  .adv-cat-item-{{ section.id }}:hover .adv-cat-image-box-{{ section.id }} img {
+    transform: scale(1.08);
+  }
+  {% endif %}
+
+  .adv-cat-image-box-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ section.settings.image_fit }};
+    transition: transform 0.4s ease;
+  }
+
+  .adv-cat-image-box-{{ section.id }} svg {
+    width: 50%;
+    height: 50%;
+    fill: #ccc;
+  }
+
+  /* Item Title & Subtext */
+  .adv-cat-title-{{ section.id }} {
+    font-size: {{ section.settings.item_title_size_mobile }}px;
+    color: {{ section.settings.text_color }};
+    font-weight: {{ section.settings.item_title_weight }};
+    text-align: {{ section.settings.item_title_alignment }};
+    margin: 0;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .adv-cat-subtext-{{ section.id }} {
+    font-size: 12px;
+    color: #666;
+    margin: 4px 0 0 0;
+    text-align: {{ section.settings.item_title_alignment }};
+  }
+
+  .adv-cat-item-{{ section.id }}:hover .adv-cat-title-{{ section.id }} {
+    color: {{ section.settings.text_hover_color }};
+    text-decoration: underline;
+  }
+
+  @media screen and (min-width: 768px) {
+    .adv-cat-title-{{ section.id }} {
+      font-size: {{ section.settings.item_title_size_desktop }}px;
+    }
+    .adv-cat-subtext-{{ section.id }} {
+      font-size: 13px;
+    }
+  }
+
+  /* Arrow Navigation (Screenshot Style) */
+  .adv-cat-nav-btn-{{ section.id }} {
+    position: absolute;
+    top: calc(50% - ({{ section.settings.item_title_size_desktop }}px + {{ section.settings.text_margin_top }}px) / 2); /* Centers based on image card */
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background-color: {{ section.settings.arrow_bg_color }};
+    color: {{ section.settings.arrow_icon_color }};
+    border: 1px solid {{ section.settings.arrow_border_color }};
+    border-radius: {% if section.settings.arrow_shape == 'circle' %}50%{% elsif section.settings.arrow_shape == 'rounded_square' %}8px{% else %}0{% endif %};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+  }
+
+  .adv-cat-nav-btn-{{ section.id }}:hover {
+    background-color: {{ section.settings.arrow_bg_hover }};
+    color: {{ section.settings.arrow_icon_hover }};
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  }
+
+  .adv-cat-nav-btn-{{ section.id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .adv-cat-nav-btn-{{ section.id }}:disabled {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Overlapping arrows like the screenshot */
+  .adv-cat-nav-prev-{{ section.id }} {
+    left: {% if section.settings.arrow_position == 'overlap' %}-15px{% else %}-50px{% endif %};
+  }
+  .adv-cat-nav-next-{{ section.id }} {
+    right: {% if section.settings.arrow_position == 'overlap' %}-15px{% else %}-50px{% endif %};
+  }
+
+  /* Responsive Width Adjustments */
+  @media screen and (min-width: 768px) {
+    .adv-cat-track-{{ section.id }} {
+      gap: {{ section.settings.gap_desktop }}px;
+    }
+  }
+
+  /* Laptop Breakpoint */
+  @media screen and (max-width: 1199px) and (min-width: 992px) {
+    .adv-cat-layout-slider .adv-cat-item-{{ section.id }} {
+      flex: 0 0 calc((100% - ({{ section.settings.laptop_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.laptop_items }});
+    }
+    .adv-cat-layout-grid .adv-cat-item-{{ section.id }} {
+      width: calc((100% - ({{ section.settings.laptop_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.laptop_items }});
+    }
+  }
+
+  /* Tablet Breakpoint */
+  @media screen and (max-width: 991px) and (min-width: 768px) {
+    .adv-cat-layout-slider .adv-cat-item-{{ section.id }} {
+      flex: 0 0 calc((100% - ({{ section.settings.tablet_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.tablet_items }});
+    }
+    .adv-cat-layout-grid .adv-cat-item-{{ section.id }} {
+      width: calc((100% - ({{ section.settings.tablet_items | minus: 1 }} * {{ section.settings.gap_desktop }}px)) / {{ section.settings.tablet_items }});
+    }
+    {% if section.settings.hide_arrows_tablet %}
+      .adv-cat-nav-btn-{{ section.id }} { display: none; }
+    {% endif %}
+  }
+
+  /* Mobile Breakpoint */
+  @media screen and (max-width: 767px) {
+    .adv-cat-layout-slider .adv-cat-item-{{ section.id }} {
+      flex: 0 0 calc((100% - {{ section.settings.gap_mobile }}px) / {{ section.settings.mobile_items }});
+    }
+    .adv-cat-layout-grid .adv-cat-item-{{ section.id }} {
+      /* In grid mode on mobile, parse floating point to standard integer or exact calc */
+      width: calc((100% - {{ section.settings.gap_mobile }}px) / {{ section.settings.mobile_items | round }});
+    }
+    
+    {% if section.settings.hide_arrows_mobile %}
+      .adv-cat-nav-btn-{{ section.id }} { display: none; }
+    {% endif %}
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }}-padding" data-section-id="{{ section.id }}">
+  <div class="adv-cat-container-{{ section.id }}">
+    
+    <div class="adv-cat-header-wrapper-{{ section.id }}">
+      {%- if section.settings.title != blank -%}
+        <div class="adv-cat-header-{{ section.id }}">
+          <h2>{{ section.settings.title }}</h2>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.action_text != blank -%}
+        <a href="{{ section.settings.action_link | default: '#' }}" class="adv-cat-action-link-{{ section.id }}">
+          {{ section.settings.action_text }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="adv-cat-wrapper-{{ section.id }} adv-cat-layout-{{ section.settings.layout_mode }}">
+      
+      {%- if section.settings.layout_mode == 'slider' and section.settings.show_arrows -%}
+        <button class="adv-cat-nav-btn-{{ section.id }} adv-cat-nav-prev-{{ section.id }}" aria-label="Previous">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      {%- endif -%}
+
+      <div class="adv-cat-track-{{ section.id }}" id="AdvCatTrack-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          <a href="{{ block.settings.link | default: '#' }}" class="adv-cat-item-{{ section.id }}" {{ block.shopify_attributes }}>
+            <div class="adv-cat-image-box-{{ section.id }}">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | img_url: '800x' }}" 
+                     alt="{{ block.settings.image.alt | default: block.settings.title }}"
+                     loading="lazy"
+                     width="{{ block.settings.image.width }}"
+                     height="{{ block.settings.image.height }}">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+            {%- if block.settings.title != blank -%}
+              <h3 class="adv-cat-title-{{ section.id }}">{{ block.settings.title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.subtext != blank -%}
+              <p class="adv-cat-subtext-{{ section.id }}">{{ block.settings.subtext }}</p>
+            {%- endif -%}
+          </a>
+        {%- else -%}
+          {%- for i in (1..8) -%}
+             <a href="#" class="adv-cat-item-{{ section.id }}">
+              <div class="adv-cat-image-box-{{ section.id }}">
+                 {{ 'collection-' | append: i | placeholder_svg_tag }}
+              </div>
+              <h3 class="adv-cat-title-{{ section.id }}">Category {{ i }}</h3>
+            </a>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.layout_mode == 'slider' and section.settings.show_arrows -%}
+        <button class="adv-cat-nav-btn-{{ section.id }} adv-cat-nav-next-{{ section.id }}" aria-label="Next">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+{%- if section.settings.layout_mode == 'slider' -%}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initAdvCatSlider_{{ section.id | replace: '-', '_' }}();
+  });
+
+  document.addEventListener('shopify:section:load', function(event) {
+    if (event.detail.sectionId === '{{ section.id }}') {
+      initAdvCatSlider_{{ section.id | replace: '-', '_' }}();
+    }
+  });
+
+  function initAdvCatSlider_{{ section.id | replace: '-', '_' }}() {
+    const track = document.getElementById('AdvCatTrack-{{ section.id }}');
+    /* Scoping arrows strongly by section ID ensures complete independence */
+    const prevBtn = document.querySelector('.adv-cat-nav-prev-{{ section.id }}');
+    const nextBtn = document.querySelector('.adv-cat-nav-next-{{ section.id }}');
+
+    if (!track) return;
+
+    const checkButtons = () => {
+      if (prevBtn) {
+        prevBtn.disabled = track.scrollLeft <= 5; 
+      }
+      if (nextBtn) {
+        const maxScrollLeft = track.scrollWidth - track.clientWidth;
+        nextBtn.disabled = track.scrollLeft >= (maxScrollLeft - 5);
+      }
+    };
+
+    const getScrollAmount = () => {
+      const firstItem = track.querySelector('.adv-cat-item-{{ section.id }}');
+      if (firstItem) {
+        const gap = parseInt(window.getComputedStyle(track).gap) || 0;
+        return (firstItem.offsetWidth + gap) * 2; 
+      }
+      return track.clientWidth / 2;
+    };
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+      });
+    }
+
+    let isScrolling;
+    track.addEventListener('scroll', () => {
+      window.clearTimeout(isScrolling);
+      isScrolling = setTimeout(checkButtons, 66);
+    });
+    
+    window.addEventListener('resize', checkButtons);
+    setTimeout(checkButtons, 200);
+  }
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Advanced Category Slider",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📐 Layout Options"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "label": "Container Max Width",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "layout_mode",
+      "label": "Desktop Layout Mode",
+      "options": [
+        { "value": "slider", "label": "Carousel / Slider" },
+        { "value": "grid", "label": "Grid (Multi-row)" }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "header",
+      "content": "📱 Responsive Grid Settings"
+    },
+    {
+      "type": "range",
+      "id": "desktop_items",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "label": "Items on Desktop (>1200px)",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "laptop_items",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "label": "Items on Laptop (992px - 1199px)",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "tablet_items",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Items on Tablet (768px - 991px)",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_items",
+      "label": "Items on Mobile (<767px)",
+      "options": [
+        { "value": "1", "label": "1 Item" },
+        { "value": "1.5", "label": "1.5 Items (Peek Effect)" },
+        { "value": "2", "label": "2 Items" },
+        { "value": "2.5", "label": "2.5 Items (Peek Effect)" },
+        { "value": "3", "label": "3 Items" }
+      ],
+      "default": "2.5"
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between items (Desktop)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "min": 8,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Gap between items (Mobile)",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colors & Backgrounds"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#F6F5F2"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card Border Color",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Category Title Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_hover_color",
+      "label": "Category Title Hover Color",
+      "default": "#555555"
+    },
+    {
+      "type": "header",
+      "content": "🖼️ Card & Image Settings"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Border Radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Image Inner Padding",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image Box Aspect Ratio",
+      "options": [
+        { "value": "1 / 1", "label": "Square (1:1)" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Tall Portrait (3:4)" },
+        { "value": "auto", "label": "Auto Adapt" }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image Fit inside Box",
+      "options": [
+        { "value": "contain", "label": "Contain (Show Full Image)" },
+        { "value": "cover", "label": "Cover (Fill Box completely)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Card Hover Animation",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "lift", "label": "Lift Up & Shadow" },
+        { "value": "zoom", "label": "Image Zoom In" }
+      ],
+      "default": "lift"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Typography & Text Alignment"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Heading",
+      "default": "Shop by collection"
+    },
+    {
+      "type": "text",
+      "id": "action_text",
+      "label": "Action Link Text",
+      "default": "See all collections"
+    },
+    {
+      "type": "url",
+      "id": "action_link",
+      "label": "Action Link URL"
+    },
+    {
+      "type": "range",
+      "id": "title_size_desktop",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Desktop)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Heading Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "select",
+      "id": "title_transform",
+      "label": "Heading Text Transform",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below Heading",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "item_title_size_desktop",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Category Title Size (Desktop)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "item_title_size_mobile",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Category Title Size (Mobile)",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "item_title_weight",
+      "label": "Category Title Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "select",
+      "id": "item_title_alignment",
+      "label": "Category Title Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "text_margin_top",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Space between Image & Title",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "➡️ Slider Arrow Settings (Screenshot matching)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Enable Navigation Arrows",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "arrow_shape",
+      "label": "Arrow Button Shape",
+      "options": [
+        { "value": "circle", "label": "Circle" },
+        { "value": "rounded_square", "label": "Rounded Square (Like Screenshot)" }
+      ],
+      "default": "rounded_square"
+    },
+    {
+      "type": "select",
+      "id": "arrow_position",
+      "label": "Arrow Position",
+      "options": [
+        { "value": "overlap", "label": "Overlapping Edge" },
+        { "value": "outside", "label": "Outside Container" }
+      ],
+      "default": "overlap"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_color",
+      "label": "Arrow Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_color",
+      "label": "Arrow Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "Arrow Border Color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "Arrow Background (Hover)",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_hover",
+      "label": "Arrow Icon (Hover)",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_arrows_tablet",
+      "label": "Hide Arrows on Tablet",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_arrows_mobile",
+      "label": "Hide Arrows on Mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "↕️ Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "Top products"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtext (Optional)",
+          "default": "starting at $10"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Advanced Category Slider",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Top products", "subtext": "starting at $10" } },
+        { "type": "category", "settings": { "title": "Gifts for clients & employees" } },
+        { "type": "category", "settings": { "title": "Prepare for events" } },
+        { "type": "category", "settings": { "title": "Local community events" } },
+        { "type": "category", "settings": { "title": "2-day delivery" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
