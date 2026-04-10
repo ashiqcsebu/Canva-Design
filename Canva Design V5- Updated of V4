@@ -1,0 +1,3188 @@
+{% schema %}
+{
+  "name": "Customization",
+  "settings": [
+    { "type": "header", "content": "Text Settings" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Custom Apparel Studio" },
+    { "type": "font_picker", "id": "heading_font", "label": "Heading Font", "default": "sans-serif" },
+    { "type": "font_picker", "id": "body_font", "label": "Body Font", "default": "sans-serif" },
+    { "type": "header", "content": "Color Settings" },
+    { "type": "color", "id": "app_bg_color", "label": "Page Background", "default": "#f0f2f5" },
+    { "type": "color", "id": "bg_color", "label": "App Background", "default": "#ffffff" },
+    { "type": "color", "id": "card_color", "label": "Sidebar Card Background", "default": "#ffffff" },
+    { "type": "color", "id": "card_alt_color", "label": "Secondary Background", "default": "#f9fafb" },
+    { "type": "color", "id": "accent_color", "label": "Primary Accent", "default": "#2563eb" },
+    { "type": "color", "id": "text_color", "label": "Primary Text", "default": "#111827" },
+    { "type": "color", "id": "muted_color", "label": "Muted Text", "default": "#6b7280" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#e5e7eb" },
+    { "type": "color", "id": "canvas_bg_color", "label": "Canvas Area Background", "default": "#f3f4f6" },
+    { "type": "header", "content": "Modal Settings" },
+    { "type": "color_background", "id": "modal_bg_color", "label": "Modal Overlay Background", "default": "rgba(0,0,0,0.8)" },
+    { "type": "color", "id": "modal_icon_color", "label": "Modal Close Icon Color", "default": "#ffffff" },
+    { "type": "header", "content": "Fallback Images" },
+    { "type": "image_picker", "id": "fallback_image", "label": "Fallback Product Image" }
+  ],
+  "presets": [
+    { "name": "Customization" }
+  ]
+}
+{% endschema %}
+
+<!-- Added dedicated athletic fonts: Bungee, Bungee Inline, Bungee Shade, Graduate, Black Ops One, Tourney -->
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Bangers&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Inline&family=Bungee+Shade&family=Caveat&family=Cinzel&family=Courgette&family=Creepster&family=Dancing+Script&family=Fredoka+One&family=Graduate&family=Inter:wght@400;600;700&family=Lato:wght@400;700&family=Lobster&family=Montserrat:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Quicksand:wght@500;700&family=Raleway:wght@400;700&family=Righteous&family=Roboto:wght@400;700&family=Rubik:wght@400;600&family=Russo+One&family=Special+Elite&family=Tourney:wght@900&display=swap" rel="stylesheet">
+
+{% style %}
+  {{ section.settings.heading_font | font_face: font_display: 'swap' }}
+  {{ section.settings.body_font | font_face: font_display: 'swap' }}
+
+  :root {
+    --color-page-bg: {{ section.settings.app_bg_color }};
+    --color-bg: {{ section.settings.bg_color }};
+    --color-card: {{ section.settings.card_color }};
+    --color-card-alt: {{ section.settings.card_alt_color }};
+    --color-accent: {{ section.settings.accent_color }};
+    --color-txt: {{ section.settings.text_color }};
+    --color-muted: {{ section.settings.muted_color }};
+    --color-border: {{ section.settings.border_color }};
+    --color-canvas: {{ section.settings.canvas_bg_color }};
+    --color-modal-bg: {{ section.settings.modal_bg_color }};
+    --color-modal-icon: {{ section.settings.modal_icon_color }};
+    --font-heading: {{ section.settings.heading_font.family }}, {{ section.settings.heading_font.fallback_families }};
+    --font-body: {{ section.settings.body_font.family }}, {{ section.settings.body_font.fallback_families }};
+  }
+
+  .app-studio-wrapper {
+    background-color: var(--color-page-bg);
+    padding: 20px;
+    height: 100vh;
+    min-height: 800px;
+    font-family: var(--font-body);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .app-studio-wrapper * { box-sizing: border-box; }
+  
+  .app-container { 
+    width: 100%; 
+    max-width: 1600px; 
+    height: 95vh;
+    background: var(--color-bg); 
+    border-radius: 12px; 
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    position: relative; 
+  }
+  
+  /* Header UI */
+  .app-topbar { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 24px; 
+    height: 64px;
+    border-bottom: 1px solid var(--color-border); 
+    background: var(--color-bg);
+    flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .app-logo { width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--color-txt); margin: 0; }
+  .topbar-subtitle { font-size: 12px; color: var(--color-muted); font-weight: 400; margin: 0; }
+  
+  .topbar-center { display: flex; align-items: center; gap: 10px; }
+  .topbar-icon-btn { background: transparent; border: 1px solid transparent; width: 36px; height: 36px; border-radius: 6px; color: var(--color-txt); font-size: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+  .topbar-icon-btn:hover { background: var(--color-card-alt); border-color: var(--color-border); }
+  .topbar-icon-btn.text-danger:hover { color: #dc2626; background: #fee2e2; border-color: #fca5a5; }
+  
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-action-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-bg); color: var(--color-txt); font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; }
+  .topbar-action-btn:hover { background: var(--color-card-alt); }
+  
+  .divider-vertical { width: 1px; height: 24px; background: var(--color-border); margin: 0 5px; }
+
+  /* Main Workspace Layout */
+  .app-workspace { display: flex; flex: 1; overflow: hidden; }
+  
+  /* Left Sidebar */
+  .sidebar-left { 
+    width: 300px;
+    background: var(--color-bg); 
+    border-right: 1px solid var(--color-border); 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto;
+  }
+  .sidebar-left::-webkit-scrollbar { width: 6px; }
+  .sidebar-left::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+
+  /* Center Canvas */
+  .app-canvas-zone { 
+    flex: 1; 
+    background-color: var(--color-canvas); 
+    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+    background-size: 20px 20px;
+    position: relative; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    overflow: hidden; 
+  }
+  
+  .canvas-top-bar { padding: 15px; width: 100%; display: flex; justify-content: center; z-index: 10;}
+  .view-toggle-pill { display: flex; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 4px; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .view-btn { padding: 8px 20px; border-radius: 6px; border: none; background: transparent; color: var(--color-muted); font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+  .view-btn:hover { color: var(--color-txt); }
+  .view-btn.active { background: var(--color-card-alt); color: var(--color-accent); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  
+  /* Updated canvas wrapper */
+  .canvas-wrapper-shadow { margin-top: auto; margin-bottom: auto; border-radius: 8px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); background: #fff; position: relative; transition: all 0.3s ease; overflow: visible; padding: 0; }
+
+  /* Ruler Styles */
+  .ruler-tick { position: absolute; background-color: #9ca3af; }
+  .ruler-label { position: absolute; font-size: 8px; color: #4b5563; font-family: monospace; }
+  #canvas-ruler-wrapper { position: relative; width: 100%; height: 100%; }
+
+  /* Right Sidebar */
+  .sidebar-right { 
+    width: 320px; 
+    background: var(--color-bg); 
+    border-left: 1px solid var(--color-border); 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto;
+  }
+  .sidebar-right::-webkit-scrollbar { width: 6px; }
+  .sidebar-right::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+
+  /* Tool Cards (Left Sidebar UI) */
+  .tool-card { border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  .tool-card-header { display: flex; align-items: center; padding: 16px 20px; cursor: pointer; transition: 0.2s; gap: 12px; }
+  .tool-card-header:hover { background: var(--color-card-alt); }
+  .tool-icon-box { display: flex; align-items: center; justify-content: center; color: var(--color-muted); font-size: 16px; width: 24px; text-align: center; }
+  .tool-main-title { font-weight: 600; font-size: 14px; color: var(--color-txt); margin: 0; }
+  .tool-content { padding: 20px; display: none; border-top: 1px solid var(--color-border); background: var(--color-card-alt); }
+  .tool-card.active .tool-content { display: block; }
+  .tool-card.active .tool-card-header { background: var(--color-card-alt); border-left: 3px solid var(--color-accent); padding-left: 17px; }
+  .tool-card.active .tool-icon-box { color: var(--color-accent); }
+  .tool-card.active .tool-main-title { color: var(--color-accent); }
+
+  /* Static Panels (Right Sidebar UI) */
+  .static-panel { padding: 20px; border-bottom: 1px solid var(--color-border); }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; cursor: pointer; }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--color-txt); margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  /* Inputs & Forms */
+  .prop-group { margin-bottom: 15px; }
+  .prop-label { font-size: 12px; font-weight: 600; color: var(--color-muted); margin-bottom: 8px; display: block; }
+  .custom-input-modern { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; background: #fff; color: var(--color-txt); transition: 0.2s; }
+  .custom-input-modern:focus { border-color: var(--color-accent); outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+  
+  .btn-add-element { width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--color-txt); transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+  .btn-add-element:hover { background: var(--color-card-alt); border-color: #d1d5db; }
+  .btn-add-element.primary-style { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .btn-add-element.primary-style:hover { opacity: 0.9; }
+
+  /* Names & Numbers Styles */
+  .checkbox-group-modern { display: flex; gap: 20px; margin-bottom: 15px; }
+  .custom-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--color-txt); }
+  .custom-checkbox input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--color-accent); }
+  .side-height-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+
+  /* Advanced Controls (Alignment, Spacing) */
+  .quick-align-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
+  .quick-align-btn { padding: 8px; border: 1px solid var(--color-border); background: #fff; border-radius: 4px; cursor: pointer; color: var(--color-muted); transition: 0.2s; }
+  .quick-align-btn:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+
+  /* Variants UI */
+  .variant-option-group { margin-bottom: 15px; }
+  .variant-option-group:last-child { margin-bottom: 0; }
+  .option-values { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .color-swatch-modern { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--color-border); cursor: pointer; transition: 0.2s; }
+  .color-swatch-modern.active { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .size-pill { padding: 8px 16px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-bg); cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 13px; color: var(--color-txt); }
+  .size-pill:hover { border-color: #9ca3af; }
+  .size-pill.active { border-color: var(--color-accent); background: var(--color-accent); color: #fff; }
+
+  /* Layers UI */
+  .layers-list { display: flex; flex-direction: column; gap: 8px; }
+  .layer-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .layer-item:hover { border-color: #d1d5db; }
+  .layer-item.active { border-color: var(--color-accent); background: #eff6ff; }
+  .layer-info { font-size: 13px; font-weight: 600; color: var(--color-txt); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 8px; pointer-events: none; }
+  .layer-actions { display: flex; gap: 4px; }
+  .layer-btn { background: none; border: none; font-size: 13px; color: var(--color-muted); cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
+  .layer-btn:hover { background: var(--color-border); color: var(--color-txt); }
+
+  /* Footer Bottom Bar */
+  .app-footer { 
+    height: 80px; 
+    border-top: 1px solid var(--color-border); 
+    background: var(--color-bg); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+  
+  .footer-left { display: flex; align-items: center; gap: 15px; }
+  .footer-right { display: flex; align-items: center; gap: 20px; }
+  
+  .price-summary-compact { display: flex; flex-direction: column; text-align: right; }
+  .price-summary-compact .label { font-size: 12px; color: var(--color-muted); }
+  .price-summary-compact .amount { font-size: 20px; font-weight: 800; color: var(--color-txt); }
+  
+  .quantity-stepper { display: flex; align-items: center; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: var(--color-bg); height: 42px; }
+  .quantity-stepper button { background: #f9fafb; border: none; width: 36px; height: 100%; font-size: 16px; cursor: pointer; color: var(--color-txt); font-weight: bold; transition: 0.2s; }
+  .quantity-stepper button:hover { background: #e5e7eb; }
+  .quantity-stepper input { width: 44px; text-align: center; border: none; border-left: 1px solid var(--color-border); border-right: 1px solid var(--color-border); font-weight: 600; background: transparent; color: var(--color-txt); font-size: 14px; height: 100%; }
+  .quantity-stepper input[readonly] { background: #f3f4f6; color: var(--color-muted); pointer-events: none; }
+  
+  .btn-submit { padding: 0 32px; height: 42px; background: var(--color-accent); color: #fff; font-weight: 700; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+  
+  /* Utilities */
+  .hidden { display: none !important; }
+  .upload-zone { border: 2px dashed var(--color-border); border-radius: 8px; padding: 25px; text-align: center; cursor: pointer; background: var(--color-bg); transition: 0.2s; }
+  .upload-zone:hover { border-color: var(--color-accent); background: #f8fafc; }
+  .upload-zone i { font-size: 24px; color: var(--color-muted); margin-bottom: 10px; display: block; }
+  input[type="range"] { width: 100%; accent-color: var(--color-accent); }
+  
+  .artwork-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .artwork-item { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: 0.2s; background: var(--color-bg); }
+  .artwork-item:hover { border-color: var(--color-accent); transform: scale(1.05); }
+
+  /* Modals */
+  .modal-overlay { position: fixed; inset: 0; background: var(--color-modal-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--color-bg); padding: 30px; border-radius: 12px; width: 100%; max-width: 900px; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+  .modal-close-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--color-txt); transition: 0.2s; z-index: 10; }
+  .modal-close-btn:hover { background: #f3f4f6; }
+  .modal-title { margin-top: 0; margin-bottom: 25px; font-weight: 700; font-size: 20px; color: var(--color-txt); text-align: center; }
+
+  /* PROFESSIONAL TEXT EDITOR STYLES */
+  .pro-editor-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; color: var(--color-txt); cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+  .pro-editor-btn:hover { border-color: var(--color-accent); background: #f9fafb; }
+  .pro-editor-btn span.label { color: var(--color-muted); }
+  .pro-editor-btn span.value { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  
+  /* Color Preview Box & Checkerboard for Transparent */
+  .color-preview-box { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--color-border); display: inline-block; background-size: cover; }
+  .checkerboard-pattern {
+    background-color: #fff;
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  }
+  
+  /* Font Grid */
+  .font-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; padding: 5px; }
+  .font-grid::-webkit-scrollbar { width: 6px; }
+  .font-grid::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+  .font-card { border: 1px solid var(--color-border); border-radius: 8px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; background: var(--color-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90px; }
+  .font-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+  .font-card.active { border-color: var(--color-accent); background: #eff6ff; }
+  .font-preview-text { font-size: 26px; margin-bottom: 5px; color: var(--color-txt); line-height: 1; }
+  .font-name-label { font-size: 11px; color: var(--color-muted); font-family: var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
+  /* Color Palette Grid */
+  .color-palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 8px; margin-top: 15px; }
+  .palette-swatch { width: 100%; aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--color-border); cursor: pointer; transition: transform 0.1s; position: relative; }
+  .palette-swatch:hover { transform: scale(1.1); box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2; }
+  .palette-swatch.active::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #fff; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+  .palette-swatch[data-color="#ffffff"]::after { color: #000; }
+  
+  /* Text Shapes Grid */
+  .shape-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--color-border); border-radius: 4px; overflow: hidden; }
+  .shape-card { border-right: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: 15px 5px; text-align: center; cursor: pointer; background: #fff; transition: 0.2s; color: #1f2937; display: flex; align-items: center; justify-content: center; height: 65px; font-family: 'Arial Black', sans-serif; overflow: hidden;}
+  .shape-card:nth-child(3n) { border-right: none; }
+  .shape-card:nth-last-child(-n+3) { border-bottom: none; }
+  .shape-card:hover { background: #f9fafb; }
+  .shape-card.active { border: 2px solid #f97316; color: #111827; box-shadow: 0 0 5px rgba(249, 115, 22, 0.2) inset; z-index: 10; position: relative; }
+
+  /* Shape Action Buttons */
+  .shape-action-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-outline-primary { flex: 1; padding: 12px; border: 1px solid var(--color-accent); border-radius: 6px; background: transparent; color: var(--color-accent); font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .btn-outline-primary:hover { background: #eff6ff; }
+  .btn-solid-primary { flex: 1; padding: 12px; border: none; border-radius: 6px; background: var(--color-accent); color: #fff; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .btn-solid-primary:hover { opacity: 0.9; }
+
+  .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: #111827; color: #fff; padding: 12px 20px; border-radius: 6px; font-weight: 600; font-size: 14px; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .toast.error { background: #dc2626; }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* TEAM LIST MODAL STYLES */
+  .team-list-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  .team-list-table th { text-align: left; font-size: 12px; color: var(--color-muted); padding: 8px; border-bottom: 1px solid var(--color-border); }
+  .team-list-table td { padding: 5px; }
+  .input-table-cell { width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; outline: none; }
+  .input-table-cell:focus { border-color: var(--color-accent); }
+  
+  .hint-box { background: #f9fafb; border-radius: 8px; padding: 15px; border-left: 4px solid var(--color-accent); margin-bottom: 20px; }
+  .hint-box h4 { margin: 0 0 10px 0; font-size: 14px; }
+  .hint-box ul { padding-left: 20px; margin: 0; font-size: 12px; color: var(--color-muted); }
+  
+  .team-summary-box { background: #f3f4f6; padding: 15px; border-radius: 6px; margin-top: 20px; display: flex; justify-content: space-between; }
+  .summary-item { text-align: center; }
+  .summary-label { display: block; font-size: 10px; text-transform: uppercase; color: var(--color-muted); font-weight: bold; }
+  .summary-value { font-size: 16px; font-weight: 700; color: var(--color-txt); }
+{% endstyle %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="app-studio-wrapper">
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-container">
+    
+    <!-- Top Header Bar -->
+    <header class="app-topbar">
+      <div class="topbar-left">
+        <div class="app-logo"><i class="fa-solid fa-layer-group"></i></div>
+        <div>
+           <h1 class="topbar-title">{{ product.title }}</h1>
+           <p class="topbar-subtitle">Custom Apparel Design</p>
+        </div>
+      </div>
+      
+      <div class="topbar-center">
+        <button onclick="changeZoom(-0.1)" class="topbar-icon-btn" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+        <span id="zoom-level" style="font-size:12px; font-weight:600; min-width:40px; text-align:center;">100%</span>
+        <button onclick="changeZoom(0.1)" class="topbar-icon-btn" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+        <div class="divider-vertical"></div>
+        <button onclick="undo()" class="topbar-icon-btn" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+        <button onclick="redo()" class="topbar-icon-btn" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
+        <button onclick="clearCanvas()" class="topbar-icon-btn" title="Clear All"><i class="fa-solid fa-broom"></i></button>
+        <div class="divider-vertical"></div>
+        <button onclick="deleteSelected()" class="topbar-icon-btn text-danger" title="Delete Object"><i class="fa-solid fa-trash"></i></button>
+      </div>
+
+      <div class="topbar-right">
+        <button class="topbar-action-btn" onclick="showPreview()"><i class="fa-solid fa-eye"></i> Preview</button>
+        <button class="topbar-icon-btn" onclick="window.history.back()" title="Go Back"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </header>
+
+    <div class="app-workspace">
+      
+      <!-- Left Sidebar (Tools & Properties) -->
+      <aside class="sidebar-left">
+
+        <!-- NAMES & NUMBERS TOOL CARD -->
+        <div class="tool-card" onclick="toggleAccordion(this)">
+          <div class="tool-card-header" style="background: #eff6ff;">
+            <div class="tool-icon-box" style="color: var(--color-accent);"><i class="fa-solid fa-users"></i></div>
+            <p class="tool-main-title" style="color: var(--color-accent);">Names & Numbers</p>
+          </div>
+          <div class="tool-content" onclick="event.stopPropagation()">
+            
+            <div class="checkbox-group-modern">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="enable-names" onchange="toggleJerseyElement('name')"> Add Names
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" id="enable-numbers" onchange="toggleJerseyElement('number')"> Add Numbers
+              </label>
+            </div>
+
+            <div class="prop-group">
+              <label class="prop-label">Placement Side</label>
+              <div class="side-height-row">
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NAME</span>
+                  <select id="name-side" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="Back">Back</option>
+                    <option value="Front">Front</option>
+                  </select>
+                </div>
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NUMBER</span>
+                  <select id="number-side" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="Back">Back</option>
+                    <option value="Front">Front</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="prop-group">
+              <label class="prop-label">Height / Size</label>
+              <div class="side-height-row">
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NAME</span>
+                  <select id="name-height" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="1">1 In</option>
+                    <option value="2" selected>2 In</option>
+                    <option value="3">3 In</option>
+                  </select>
+                </div>
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NUMBER</span>
+                  <select id="number-height" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="6">6 In</option>
+                    <option value="8" selected>8 In</option>
+                    <option value="10">10 In</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADDED: DEDICATED FONT STYLES FOR NAMES AND NUMBERS -->
+            <div class="prop-group">
+              <label class="prop-label">Font Styles</label>
+              <div class="side-height-row">
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NAME FONT</span>
+                  <select id="name-font-style" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="Arial">Arial</option>
+                    <option value="Anton">Anton</option>
+                    <option value="Bebas Neue">Bebas Neue</option>
+                    <option value="Oswald">Oswald</option>
+                    <option value="Montserrat">Montserrat</option>
+                  </select>
+                </div>
+                <div>
+                  <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NUMBER FONT</span>
+                  <select id="number-font-style" class="custom-input-modern" onchange="updateJerseyVisuals()">
+                    <option value="Arial">Basic (Arial)</option>
+                    <option value="Anton">Block (Anton)</option>
+                    <option value="Bebas Neue">Tall Block (Bebas)</option>
+                    <option value="Bungee">Thick Rounded</option>
+                    <option value="Bungee Inline">Inline (Cutout)</option>
+                    <option value="Bungee Shade">3D Shadow</option>
+                    <option value="Graduate">College/Varsity</option>
+                    <option value="Black Ops One">Stencil</option>
+                    <option value="Tourney">Outline</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-add-element primary-style" onclick="openTeamModal()" style="margin-top:10px;">
+              <i class="fa-solid fa-list"></i> Enter Names/Numbers List
+            </button>
+
+            <p style="font-size: 11px; color: var(--color-muted); margin-top: 15px; text-align: center;">
+              * Click the added text on the canvas to change its color or effect using the Text Tool below.
+            </p>
+          </div>
+        </div>
+        
+        <!-- TEXT TOOL CARD -->
+        <div class="tool-card active" onclick="toggleAccordion(this)">
+          <div class="tool-card-header">
+            <div class="tool-icon-box"><i class="fa-solid fa-font"></i></div>
+            <p class="tool-main-title">Text Style & Effects</p>
+          </div>
+          <div class="tool-content" onclick="event.stopPropagation()">
+            
+            <button onclick="addTextNew()" class="btn-add-element primary-style" style="margin-bottom: 20px;"><i class="fa-solid fa-plus"></i> Add a custom text box</button>
+
+            <!-- Text Input -->
+            <input type="text" id="master-text-val" class="custom-input-modern" placeholder="Enter text..." value="Your Text" style="margin-bottom: 15px; font-size: 16px; padding: 12px;">
+
+            <!-- Font Selection -->
+            <button class="pro-editor-btn" onclick="openFontModal('master')">
+              <span class="label">Change Font</span>
+              <span class="value" id="label-master-font" style="font-family: Arial;">Arial <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i></span>
+            </button>
+            <input type="hidden" id="master-font" value="Arial">
+
+            <!-- Color Selection (Solid / Gradient) -->
+            <button class="pro-editor-btn" onclick="openColorModal('fill')">
+              <span class="label">Edit Color</span>
+              <span class="value">
+                <span class="color-preview-box" id="preview-fill-color" style="background-color: #121212;"></span>
+                <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>
+              </span>
+            </button>
+            <input type="hidden" id="master-color" value="#121212">
+
+            <!-- Outline Color Selection -->
+            <button class="pro-editor-btn" onclick="openColorModal('stroke')">
+              <span class="label">Outline</span>
+              <span class="value">
+                <span class="color-preview-box checkerboard-pattern" id="preview-stroke-color" style="background: transparent; border-style: dashed;"></span>
+                <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>
+              </span>
+            </button>
+            <input type="hidden" id="master-stroke-color" value="transparent">
+
+            <!-- Outline Thickness -->
+            <div class="slider-container">
+              <label>Outline Size</label>
+              <input type="range" id="master-stroke-width" min="1" max="15" value="0">
+              <span class="slider-val" id="val-master-stroke-width">0</span>
+            </div>
+
+            <!-- Shape Selection -->
+            <button class="pro-editor-btn" onclick="openShapeModal()">
+              <span class="label">Text Shape</span>
+              <span class="value" id="label-master-shape">Normal <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i></span>
+            </button>
+            <input type="hidden" id="master-shape" value="normal">
+            <input type="hidden" id="master-radius" value="120">
+
+            <!-- Shadow Settings -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border);">
+                <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--color-txt);">Drop Shadow</p>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom: 10px;">
+                    <input type="checkbox" id="prop-shadow-toggle">
+                    <label class="prop-label" style="margin:0; text-transform:none;">Enable Shadow</label>
+                </div>
+                <div id="shadow-controls" class="hidden">
+                    <div class="slider-container">
+                      <label>Blur</label>
+                      <input type="range" id="prop-shadow-blur" min="0" max="50" value="10">
+                    </div>
+                    <button class="pro-editor-btn" onclick="openColorModal('shadow')" style="margin-bottom:0;">
+                      <span class="label">Shadow Color</span>
+                      <span class="value">
+                        <span class="color-preview-box" id="preview-shadow-color" style="background: rgba(0,0,0,0.5);"></span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>
+                      </span>
+                    </button>
+                    <input type="hidden" id="prop-shadow-color" value="rgba(0,0,0,0.5)">
+                </div>
+            </div>
+
+            <!-- Advanced Typography -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border);">
+                <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--color-txt);">Spacing & Alignment</p>
+                <div class="slider-container">
+                  <label>Spacing</label>
+                  <input type="range" id="prop-char-spacing" min="-100" max="500" value="0">
+                </div>
+                <div class="slider-container" style="margin-bottom: 15px;">
+                  <label>Line Height</label>
+                  <input type="range" id="prop-line-height" min="0.5" max="3" step="0.1" value="1.1">
+                </div>
+                <div class="quick-align-grid">
+                  <button class="quick-align-btn" onclick="alignObj('left')" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+                  <button class="quick-align-btn" onclick="alignObj('center')" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
+                  <button class="quick-align-btn" onclick="alignObj('right')" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+                </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- IMAGES TOOL CARD -->
+        <div class="tool-card" onclick="toggleAccordion(this)">
+          <div class="tool-card-header">
+            <div class="tool-icon-box"><i class="fa-regular fa-image"></i></div>
+            <p class="tool-main-title">Images</p>
+          </div>
+          <div class="tool-content" onclick="event.stopPropagation()">
+            <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p style="margin:0; font-weight:600; font-size:13px; color:var(--color-txt);">Click to upload</p>
+              <p style="margin:4px 0 0 0; font-size:11px; color:var(--color-muted);">PNG, JPG (Max 5MB)</p>
+            </div>
+            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleImageUpload(this.files[0]); this.value='';">
+            
+            <div id="image-properties-wrapper" class="hidden" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 15px;">
+              <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">Image Adjustments</p>
+              <div class="slider-container">
+                <label>Brightness</label>
+                <input type="range" id="prop-brightness" min="-1" max="1" step="0.1" value="0">
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom: 15px;">
+                <input type="checkbox" id="prop-grayscale">
+                <label class="prop-label" style="margin:0; text-transform:none;">Enable Grayscale</label>
+              </div>
+              <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">Flip Image</p>
+              <div style="display: flex; gap: 10px;">
+                  <button class="btn-add-element" onclick="flipImage('x')"><i class="fa-solid fa-clock-rotate-left"></i> Horizontal</button>
+                  <button class="btn-add-element" onclick="flipImage('y')"><i class="fa-solid fa-clock-rotate-left fa-rotate-90"></i> Vertical</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CANVAS TOOLS (Banner/Poster Design Mode) -->
+        <div class="tool-card" onclick="toggleAccordion(this)">
+          <div class="tool-card-header" style="background: #fdf2f8;">
+            <div class="tool-icon-box" style="color: #db2777;"><i class="fa-solid fa-object-group"></i></div>
+            <p class="tool-main-title" style="color: #db2777;">Canvas Mode</p>
+          </div>
+          <div class="tool-content" onclick="event.stopPropagation()">
+            
+            <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--color-txt);">Select Mode</p>
+            <div style="display:flex; gap:8px; margin-bottom: 15px;">
+                <button class="btn-add-element" id="mode-apparel" onclick="setCanvasMode('apparel')" style="background:var(--color-accent); color:#fff;">Apparel</button>
+                <button class="btn-add-element" id="mode-banner" onclick="setCanvasMode('banner')">Banner/Poster</button>
+            </div>
+
+            <!-- Banner Specific Tools -->
+            <div id="banner-tools" class="hidden">
+                <label class="prop-label" style="margin-top: 15px;">Real World Size</label>
+                <select id="phys-unit" onchange="updateCanvasRatio()" class="custom-input-modern" style="margin-bottom: 10px;">
+                    <option value="in">Inches (in)</option>
+                    <option value="ft">Feet (ft)</option>
+                    <option value="m">Meters (m)</option>
+                </select>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">Width</span>
+                        <input type="number" id="phys-width" value="120" min="1" class="custom-input-modern" onchange="updateCanvasRatio()" onkeyup="updateCanvasRatio()">
+                    </div>
+                    <div style="flex:1;">
+                        <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">Height</span>
+                        <input type="number" id="phys-height" value="60" min="1" class="custom-input-modern" onchange="updateCanvasRatio()" onkeyup="updateCanvasRatio()">
+                    </div>
+                </div>
+
+                <!-- Auto Conversion Display Box -->
+                <div id="conversion-display" style="margin-top: 12px; padding: 12px; background: #f9fafb; border: 1px solid var(--color-border); border-radius: 6px; font-size: 11px; color: var(--color-muted); line-height: 1.5;">
+                    <!-- Filled dynamically via JS -->
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <button class="pro-editor-btn" onclick="openColorModal('canvasBg')" style="margin-bottom:0;">
+                    <span class="label">Canvas Background</span>
+                    <span class="value">
+                      <span class="color-preview-box" id="preview-canvas-bg" style="background-color: #ffffff;"></span>
+                      <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>
+                    </span>
+                  </button>
+                  <input type="hidden" id="canvas-bg-color-val" value="#ffffff">
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--color-border);">
+                <button onclick="exportDesign('png')" class="btn-add-element" style="margin-bottom:8px;"><i class="fa-solid fa-download"></i> Download PNG</button>
+                <button onclick="exportDesign('jpg')" class="btn-add-element"><i class="fa-solid fa-download"></i> Download JPG</button>
+            </div>
+
+          </div>
+        </div>
+
+        {% if product.metafields.custom.artwork != blank %}
+        <div class="tool-card" onclick="toggleAccordion(this)">
+          <div class="tool-card-header">
+            <div class="tool-icon-box"><i class="fa-solid fa-shapes"></i></div>
+            <p class="tool-main-title">Graphics</p>
+          </div>
+          <div class="tool-content" onclick="event.stopPropagation()">
+            <div class="artwork-grid">
+              {% for image in product.metafields.custom.artwork.value %}
+                <img src="{{ image | image_url: width: 150 }}" 
+                     class="artwork-item" 
+                     onclick="addArtwork('{{ image | image_url: width: 800 }}')" 
+                     alt="Artwork option">
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </aside>
+
+      <!-- Center Canvas Workspace -->
+      <main class="app-canvas-zone">
+        <div class="canvas-top-bar">
+           <!-- DYNAMIC BUTTONS GENERATED BY METAFIELD -->
+           <div class="view-toggle-pill" id="dynamic-view-pill">
+            {% assign views_metafield = product.metafields.custom.available_views.value %}
+            {% if views_metafield != blank %}
+              {% for view in views_metafield %}
+                {% assign safe_id = view | downcase | replace: ' ', '-' %}
+                <button class="view-btn {% if forloop.first %}active{% endif %}" onclick="switchView('{{ view }}')" id="btn-view-{{ safe_id }}" data-view-name="{{ view }}">
+                  {{ view }}
+                </button>
+              {% endfor %}
+            {% else %}
+              <button class="view-btn active" onclick="switchView('Front')" id="btn-view-front" data-view-name="Front">
+                Front View
+              </button>
+              <button class="view-btn" onclick="switchView('Back')" id="btn-view-back" data-view-name="Back">
+                Back View
+              </button>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Ruler Wrapper inside Canvas Zone -->
+        <div class="canvas-wrapper-shadow" id="canvas-wrapper" style="margin: 40px; overflow: visible;">
+           <div id="canvas-ruler-wrapper" style="position: relative;">
+               <!-- Top Ruler -->
+               <div id="ruler-top" style="position: absolute; height: 20px; background-color: #f8f9fa; border-bottom: 1px solid #d1d5db; width: 100%; top: -20px; left: 0; overflow: hidden; box-sizing: border-box; display: none;"></div>
+               <!-- Left Ruler -->
+               <div id="ruler-left" style="position: absolute; width: 20px; background-color: #f8f9fa; border-right: 1px solid #d1d5db; height: 100%; left: -20px; top: 0; overflow: hidden; box-sizing: border-box; display: none;"></div>
+               
+               <canvas id="design-canvas" width="600" height="700"></canvas>
+           </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar (Layers & Product Settings) -->
+      <aside class="sidebar-right">
+        
+        <!-- Layers Panel -->
+        <div class="static-panel">
+          <h3 class="panel-title">Layers</h3>
+          <div id="layers-list" class="layers-list">
+             <p style="font-size:12px; color:var(--color-muted); text-align:center;">No elements added.</p>
+          </div>
+        </div>
+
+        <!-- TEAM ROSTER PREVIEW PANEL -->
+        <div class="static-panel" style="background: #fdfaf4; border-left: 3px solid #eab308;">
+          <h3 class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+             Team Roster
+             <button class="layer-btn" onclick="openTeamModal()" style="color:var(--color-accent); font-weight:bold;">Edit</button>
+          </h3>
+          <div id="roster-preview-sidebar" style="font-size:12px; color:var(--color-txt); max-height:150px; overflow-y:auto; line-height: 1.6;">
+            Single item selected. No team roster active.
+          </div>
+        </div>
+
+        <!-- Variant Options -->
+        {% unless product.has_only_default_variant %}
+          <div class="static-panel" id="variant-selectors-container">
+            {% for option in product.options_with_values %}
+              {% assign isColor = false %}
+              {% assign downcased_name = option.name | downcase %}
+              {% if downcased_name contains 'color' or downcased_name contains 'colour' %}
+                {% assign isColor = true %}
+              {% endif %}
+
+              <div class="variant-option-group">
+                <label class="prop-label">{{ option.name }}</label>
+                <div class="option-values">
+                  {% for value in option.values %}
+                    {% if isColor %}
+                      {% assign css_color = value | downcase | replace: ' ', '' %}
+                      <button type="button" 
+                              class="color-swatch-modern variant-btn {% if option.selected_value == value %}active{% endif %}"
+                              style="background-color: {{ css_color }};"
+                              data-option-index="{{ option.position | minus: 1 }}"
+                              data-value="{{ value | escape }}"
+                              title="{{ value }}"></button>
+                    {% else %}
+                      <button type="button" 
+                              class="size-pill variant-btn {% if option.selected_value == value %}active{% endif %}"
+                              data-option-index="{{ option.position | minus: 1 }}"
+                              data-value="{{ value | escape }}">{{ value }}</button>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endunless %}
+
+        <!-- Custom Extras -->
+        {% if product.metafields.custom.custom_extras != blank %}
+        <div class="static-panel">
+          <h3 class="panel-title">Extras</h3>
+          {% for variant in product.metafields.custom.custom_extras.value %}
+            <div style="display:flex; gap:10px; margin-bottom:8px; align-items:center;">
+              <input type="checkbox" class="addon-checkbox"
+                data-label="{{ variant.product.title | escape }} {% if variant.title != 'Default Title' %}- {{ variant.title | escape }}{% endif %}"
+                data-price="{{ variant.price }}"
+                data-vid="{{ variant.id }}"
+                onchange="updateSubtotal()">
+             <span style="font-size:13px; color: var(--color-txt);">
+                {{ variant.title }}
+                <span style="color:var(--color-muted);">(+{{ variant.price | money }})</span>
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Graphic Location -->
+        {% if product.metafields.custom.graphic_location != blank %}
+        <div class="static-panel">
+          <h3 class="panel-title">Graphic Location</h3>
+          {% for variant in product.metafields.custom.graphic_location.value %}
+            <div style="display:flex; gap:10px; margin-bottom:8px; align-items:center;">
+              <input type="checkbox" class="addon-checkbox"
+                data-label="{{ variant.product.title | escape }} {% if variant.title != 'Default Title' %}- {{ variant.title | escape }}{% endif %}"
+                data-price="{{ variant.price }}"
+                data-vid="{{ variant.id }}"
+                onchange="updateSubtotal()">
+             <span style="font-size:13px; color: var(--color-txt);">
+                {{ variant.title }}
+                <span style="color:var(--color-muted);">(+{{ variant.price | money }})</span>
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Custom Details -->
+        {% if product.metafields.custom.custom_form_field != blank %}
+        <div class="static-panel">
+          <h3 class="panel-title">Order Details</h3>
+          {% for field in product.metafields.custom.custom_form_field.value %}
+            <div class="prop-group" style="margin-bottom: 12px;">
+              <label class="prop-label">{{ field }}</label>
+              <input type="text" class="custom-input-modern custom-metafield-input" data-label="{{ field }}" placeholder="Enter {{ field }}...">
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Price Breakdown -->
+        <div class="static-panel" style="border-bottom: none; padding-bottom: 30px;">
+           <h3 class="panel-title">Price Details</h3>
+           <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:var(--color-muted);">
+              <span>Base Cost (x<span id="multiplier-display">1</span>)</span>
+              <span id="summary-base-price">{{ product.price | money }}</span>
+           </div>
+           <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:var(--color-muted);">
+              <span id="addon-label">Extras (0)</span>
+              <span id="summary-addon-price" style="color:var(--color-txt);">+$0.00</span>
+           </div>
+           <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px dashed var(--color-border); font-size:13px; font-weight:bold; color:var(--color-txt);">
+              <span>Print Cost (Names/Nums)</span>
+              <span id="summary-print-price">+$0.00</span>
+           </div>
+        </div>
+
+        <input type="hidden" id="selected-variant-id" value="{{ product.selected_or_first_available_variant.id }}">
+        <input type="hidden" id="current-variant-price" value="{{ product.selected_or_first_available_variant.price | default: 0 }}">
+        <input type="hidden" id="shop-money-format" value="{{ shop.money_format | escape }}">
+        
+        <script type="application/json" id="ProductJson-{{ section.id }}">{{ product.variants | json }}</script>
+        
+        <script type="application/json" id="product-media-json">
+          [
+            {% for image in product.images %}
+              { "id": {{ image.id | default: "null" }}, "url": "{{ image | image_url: width: 600 }}", "alt": {{ image.alt | json }} }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        </script>
+      </aside>
+    </div>
+
+    <!-- Bottom Footer Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+          <p style="font-size:12px; color:var(--color-muted); margin:0;">
+             * <i class="fa-solid fa-circle-info"></i> Adjust quantity manually or use the Team List to auto-calculate.
+          </p>
+      </div>
+      
+      <div class="footer-right">
+        <div class="price-summary-compact">
+           <span class="label">Total Price</span>
+           <span class="amount" id="subtotal-display">{{ product.price | money }}</span>
+        </div>
+        
+        <div class="quantity-stepper">
+          <button type="button" onclick="changeQty(-1)">−</button>
+          <input type="number" id="quantity" value="1" min="1" max="999" onchange="updateSubtotal()">
+          <button type="button" onclick="changeQty(1)">+</button>
+        </div>
+
+        <button type="button" id="add-to-cart-submit-bottom" onclick="handleCartSubmit(event)" class="btn-submit">
+           Add to Cart <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="preview-modal" class="modal-overlay hidden" onclick="closePreviewModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closePreviewModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title">Design Preview</h2>
+    <div class="modal-body" id="dynamic-preview-body"></div>
+  </div>
+</div>
+
+<!-- FONTS MODAL -->
+<div id="font-modal" class="modal-overlay hidden" onclick="closeFontModal()">
+  <div class="modal-content" style="max-width: 800px;" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeFontModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title">Choose a Font</h2>
+    <div class="font-grid" id="font-grid-container">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- COLOR PALETTE MODAL (Updated for Solid & Gradient) -->
+<div id="color-modal" class="modal-overlay hidden" onclick="closeColorModal()">
+  <div class="modal-content" style="max-width: 500px;" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeColorModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title" id="color-modal-title">Select Color</h2>
+    
+    <!-- Tabs for Solid vs Gradient -->
+    <div style="display:flex; border-bottom:1px solid var(--color-border); margin-bottom:15px;">
+        <button id="tab-solid" onclick="switchColorTab('solid')" style="flex:1; padding:10px; font-weight:bold; border-bottom:2px solid var(--color-accent); color:var(--color-accent); background:none; cursor:pointer; font-size:14px;">Solid</button>
+        <button id="tab-gradient" onclick="switchColorTab('gradient')" style="flex:1; padding:10px; font-weight:bold; border-bottom:2px solid transparent; color:var(--color-muted); background:none; cursor:pointer; font-size:14px;">Gradient</button>
+    </div>
+
+    <!-- Solid Color Section -->
+    <div id="section-solid">
+        <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin-bottom: 15px; display:flex; align-items:flex-start; gap: 10px;">
+            <i class="fa-solid fa-circle-exclamation" style="color: #6b7280; margin-top: 3px;"></i>
+            <p style="font-size:13px; color: #374151; margin:0;">Ensure your color choice contrasts well with the background.</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <button onclick="selectColor('transparent')" style="padding: 8px 15px; border: 1px solid var(--color-border); border-radius: 6px; background:#fff; cursor:pointer; font-size:13px;">
+               <i class="fa-solid fa-ban" style="color:#ef4444;"></i> No Color / Transparent
+            </button>
+        </div>
+        <div class="color-palette-grid" id="color-palette-container">
+          <!-- Generated by JS -->
+        </div>
+    </div>
+
+    <!-- Gradient Color Section -->
+    <div id="section-gradient" class="hidden">
+        <p style="font-size:13px; font-weight:600; margin-bottom:10px; color:var(--color-txt);">Build your gradient:</p>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label style="font-size:11px; color:var(--color-muted); display:block; margin-bottom:4px; font-weight:bold;">COLOR 1</label>
+                <input type="color" id="grad-color-1" value="#ff0000" class="custom-input-modern" style="padding:2px; height:40px; cursor:pointer; border-radius:8px;">
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:11px; color:var(--color-muted); display:block; margin-bottom:4px; font-weight:bold;">COLOR 2</label>
+                <input type="color" id="grad-color-2" value="#0000ff" class="custom-input-modern" style="padding:2px; height:40px; cursor:pointer; border-radius:8px;">
+            </div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <label style="font-size:11px; color:var(--color-muted); display:block; margin-bottom:4px; font-weight:bold;">DIRECTION</label>
+            <select id="grad-dir" class="custom-input-modern">
+                <option value="horizontal">Horizontal (Left to Right)</option>
+                <option value="vertical">Vertical (Top to Bottom)</option>
+                <option value="diagonal">Diagonal</option>
+            </select>
+        </div>
+        <button onclick="applyGradient()" class="btn-solid-primary" style="width:100%; padding:12px;">Apply Gradient Priority</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TEXT SHAPE MODAL -->
+<div id="shape-modal" class="modal-overlay hidden" onclick="closeShapeModal()">
+  <div class="modal-content" style="max-width: 550px;" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeShapeModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title" style="text-align:left; font-size:16px; margin-bottom:15px; font-weight:normal;">Choose Text Shape</h2>
+    
+    <div class="shape-grid">
+      <div class="shape-card" data-shape="normal" onclick="selectShape('normal')">
+          <span style="font-size:14px; font-weight:900;">NORMAL</span>
+      </div>
+      <div class="shape-card" data-shape="curve" onclick="selectShape('curve')">
+          <svg viewBox="0 0 100 40" width="100%" height="40"><path id="p-curve" d="M 10 20 Q 50 40 90 20" fill="transparent"/><text><textPath href="#p-curve" startOffset="50%" text-anchor="middle" font-weight="900" font-family="'Arial Black', sans-serif" font-size="14" fill="#111">CURVE</textPath></text></svg>
+      </div>
+      <div class="shape-card" data-shape="arch" onclick="selectShape('arch')">
+          <svg viewBox="0 0 100 40" width="100%" height="40"><path id="p-arch" d="M 10 30 Q 50 5 90 30" fill="transparent"/><text><textPath href="#p-arch" startOffset="50%" text-anchor="middle" font-weight="900" font-family="'Arial Black', sans-serif" font-size="14" fill="#111">ARCH</textPath></text></svg>
+      </div>
+      <div class="shape-card" data-shape="bridge" onclick="selectShape('bridge')">
+          <span style="font-size:14px; font-weight:900; transform: perspective(20px) rotateX(5deg);">BRIDGE</span>
+      </div>
+      <div class="shape-card" data-shape="valley" onclick="selectShape('valley')">
+          <span style="font-weight:900; display:flex; align-items:flex-end;">
+              <span style="font-size:18px">V</span><span style="font-size:14px">A</span><span style="font-size:11px">L</span><span style="font-size:11px">L</span><span style="font-size:14px">E</span><span style="font-size:18px">Y</span>
+          </span>
+      </div>
+      <div class="shape-card" data-shape="pinch" onclick="selectShape('pinch')">
+          <span style="font-weight:900; display:flex; align-items:center;">
+              <span style="font-size:18px">P</span><span style="font-size:13px">I</span><span style="font-size:10px">N</span><span style="font-size:13px">C</span><span style="font-size:18px">H</span>
+          </span>
+      </div>
+      <div class="shape-card" data-shape="bulge" onclick="selectShape('bulge')">
+          <span style="font-weight:900; display:flex; align-items:center;">
+              <span style="font-size:10px">B</span><span style="font-size:14px">U</span><span style="font-size:18px">L</span><span style="font-size:14px">G</span><span style="font-size:10px">E</span>
+          </span>
+      </div>
+      <div class="shape-card" data-shape="perspective" onclick="selectShape('perspective')">
+          <span style="font-weight:900; font-size:12px; transform: perspective(100px) rotateY(20deg);">PERSPECTIVE</span>
+      </div>
+      <div class="shape-card" data-shape="pointed" onclick="selectShape('pointed')">
+          <span style="font-weight:900; display:flex; align-items:center;">
+              <span style="font-size:9px">P</span><span style="font-size:11px">O</span><span style="font-size:14px">I</span><span style="font-size:17px">N</span><span style="font-size:14px">T</span><span style="font-size:11px">E</span><span style="font-size:9px">D</span>
+          </span>
+      </div>
+      <div class="shape-card" data-shape="downward" onclick="selectShape('downward')">
+          <span style="font-size:12px; font-weight:900; transform: skewY(15deg);">DOWNWARD</span>
+      </div>
+      <div class="shape-card" data-shape="upward" onclick="selectShape('upward')">
+          <span style="font-size:12px; font-weight:900; transform: skewY(-15deg);">UPWARD</span>
+      </div>
+      <div class="shape-card" data-shape="cone" onclick="selectShape('cone')">
+          <span style="font-weight:900; display:flex; align-items:center;">
+              <span style="font-size:20px">C</span><span style="font-size:15px">O</span><span style="font-size:11px">N</span><span style="font-size:9px">E</span>
+          </span>
+      </div>
+    </div>
+
+    <div style="margin-top: 25px;">
+        <p style="font-size: 14px; color: var(--color-txt); margin-bottom: 10px;">Choose shape settings</p>
+        <div class="slider-container" style="border:none; padding:15px; background:#f9fafb;">
+          <label style="width: auto; font-size:12px; color:#4b5563;">Small</label>
+          <input type="range" id="modal-shape-slider" min="10" max="300" step="10" value="120" oninput="updateShapeSlider(this.value)">
+          <span style="font-size:12px; color: #4b5563;">Large</span>
+        </div>
+    </div>
+
+    <div class="shape-action-btns">
+        <button class="btn-outline-primary" onclick="removeShape()">Remove Shape</button>
+        <button class="btn-solid-primary" onclick="closeShapeModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM LIST MODAL (NEW ADDITION) -->
+<div id="team-modal" class="modal-overlay hidden" onclick="closeTeamModal()">
+  <div class="modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeTeamModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title">Team Member List</h2>
+    
+    <div style="display: flex; gap: 30px;">
+      <!-- Left side: Table -->
+      <div style="flex: 2;">
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table class="team-list-table">
+            <thead>
+              <tr>
+                <th style="width: 45%;">Name (Optional)</th>
+                <th style="width: 25%;">Number</th>
+                <th style="width: 20%;">Size</th>
+                <th style="width: 10%;"></th>
+              </tr>
+            </thead>
+            <tbody id="team-input-body">
+              <!-- Rows are populated by JS -->
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: 15px; display:flex; justify-content: space-between;">
+           <button class="layer-btn" onclick="addPlayerRow()"><i class="fa-solid fa-plus"></i> Add Player</button>
+           <button class="layer-btn" onclick="clearRoster()" style="color:red;"><i class="fa-solid fa-trash"></i> Clear List</button>
+        </div>
+
+        <div class="team-summary-box">
+          <div class="summary-item">
+            <span class="summary-label">Total Players</span>
+            <span class="summary-value" id="sum-items">0</span>
+          </div>
+          <div class="summary-item" style="flex: 2; text-align: left; padding-left: 20px; border-left: 1px solid var(--color-border);">
+            <span class="summary-label">Size Breakdown</span>
+            <span class="summary-value" id="sum-sizes" style="font-size: 13px; font-weight:normal;">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side: Hints & Submit -->
+      <div style="flex: 1;">
+        <div class="hint-box">
+          <h4>Helpful Hints</h4>
+          <ul>
+            <li>Leave 'Name' blank if you only want numbers.</li>
+            <li>Double-check spelling before submitting.</li>
+            <li>Max length for names is generally 15 characters.</li>
+            <li>You can change the quantity automatically by adding members here.</li>
+          </ul>
+        </div>
+        <button class="btn-submit" onclick="closeTeamModal()" style="width:100%;">Done Editing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ─── State for Team Roster (NEW) ────────────────────────── */
+  var roster = [{ name: '', number: '', size: 'L' }]; // Default one row
+  var jerseyNameObj = null;
+  var jerseyNumberObj = null;
+  
+  // Custom prices for printing Names/Numbers (in cents). 
+  // Set to 0 if you don't want to charge extra. Let's assume $5 for name, $3 for number for example.
+  var COST_PRINT_NAME = 500;   // $5.00
+  var COST_PRINT_NUMBER = 300; // $3.00
+
+  /* ─── Utilities ─────────────────────────────────────── */
+  function showToast(msg, type) {
+    type = type || 'success';
+    var container = document.getElementById('toast-container');
+    if (!container) return;
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerText = msg;
+    container.appendChild(toast);
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
+  }
+
+  /* ─── Money formatting ───────────────────────────────── */
+  var moneyFormatEl = document.getElementById('shop-money-format');
+  var defaultFormat = "$\x7B\x7Bamount\x7D\x7D";
+  var moneyFormat = moneyFormatEl ? moneyFormatEl.value : defaultFormat;
+  
+  if (moneyFormat.indexOf('shop.money_format') !== -1 || moneyFormat.indexOf('\x7B\x7B') !== -1) {
+    moneyFormat = defaultFormat; 
+  }
+
+  function formatMoney(cents) {
+    if (typeof cents === 'string') { cents = cents.replace('.', ''); }
+    cents = parseInt(cents, 10) || 0;
+    var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+    var match = (moneyFormat || '').match(placeholderRegex);
+    if (!match) { return '$' + (cents / 100).toFixed(2); }
+
+    function formatWithDelimiters(number, precision, thousands, decimal) {
+      precision = precision !== undefined ? precision : 2;
+      thousands = thousands || ',';
+      decimal = decimal || '.';
+      if (isNaN(number) || number == null) { return '0'; }
+      number = (number / 100.0).toFixed(precision);
+      var parts = number.split('.');
+      var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+      var centsPart = parts[1] ? (decimal + parts[1]) : '';
+      return dollars + centsPart;
+    }
+
+    var value = '';
+    switch (match[1]) {
+      case 'amount': value = formatWithDelimiters(cents, 2); break;
+      case 'amount_no_decimals': value = formatWithDelimiters(cents, 0); break;
+      case 'amount_with_comma_separator': value = formatWithDelimiters(cents, 2, '.', ','); break;
+      case 'amount_no_decimals_with_comma_separator': value = formatWithDelimiters(cents, 0, '.', ','); break;
+      default: value = formatWithDelimiters(cents, 2);
+    }
+    return moneyFormat.replace(placeholderRegex, value);
+  }
+
+  /* ─── Canvas setup & Dynamic Views ───────────────────────────────────── */
+  var CANVAS_W   = 600;
+  var CANVAS_H   = 700;
+  window.baseVisualWidth = CANVAS_W;
+  window.baseVisualHeight = CANVAS_H;
+  window.currentZoom = 1;
+
+  var isBannerMode = false;
+  
+  // Base properties to save
+  var CUSTOM_PROPS = ['id', 'text', 'effect', 'intensity', 'spacing', 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'textAlign', 'fill', 'opacity', 'angle', 'filters', 'stroke', 'strokeWidth', 'shadow', 'lineHeight', 'charSpacing', 'name'];
+
+  var fallbackImage = "{{ section.settings.fallback_image | image_url: width: 600 }}";
+  if (!fallbackImage || fallbackImage.indexOf('no-image') !== -1) fallbackImage = '';
+
+  var productMedia = [];
+  try {
+    var mediaJsonEl = document.getElementById('product-media-json');
+    var mediaStr = mediaJsonEl ? mediaJsonEl.innerHTML.trim() : '';
+    if (mediaStr && !mediaStr.includes('\x7B%')) {
+      productMedia = JSON.parse(mediaStr);
+    }
+  } catch(e) {
+    productMedia = [];
+  }
+
+  var availableViews = [];
+  document.querySelectorAll('.view-btn').forEach(function(btn) {
+      availableViews.push(btn.getAttribute('data-view-name').toLowerCase());
+  });
+
+  var currentArea        = availableViews.length > 0 ? availableViews[0] : 'front';
+  var currentColorName  = '';
+  var currentBgUrl      = fallbackImage;
+  
+  var areaStates        = {};
+  var historyData       = [];
+  var historyIdx        = -1;
+  var isRestoringState  = false;
+
+  var APPAREL_FONTS = [
+    'Arial', 'Montserrat', 'Oswald', 'Bebas Neue', 'Lobster', 'Pacifico',
+    'Anton', 'Righteous', 'Permanent Marker', 'Caveat', 'Russo One',
+    'Bangers', 'Fredoka One', 'Alfa Slab One', 'Playfair Display',
+    'Cinzel', 'Dancing Script', 'Courgette', 'Creepster', 'Special Elite',
+    'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Inter',
+    'Raleway', 'Ubuntu', 'Nunito', 'Quicksand', 'Rubik'
+  ];
+  var currentFontTarget = 'master';
+
+  var PRESET_COLORS = [
+      '#ffffff', '#000000', '#4b5563', '#9ca3af', '#d1d5db', '#ef4444', '#f97316', '#f59e0b', '#eab308',
+      '#84cc16', '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6',
+      '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#78350f', '#92400e', '#b45309', '#d97706', '#f59e0b',
+      '#fcd34d', '#fef3c7', '#86198f', '#4c1d95', '#1e3a8a', '#1e40af', '#1d4ed8', '#0369a1', '#075985'
+  ];
+  var colorTargetType = 'fill'; 
+
+  var currentVariantPriceEl = document.getElementById('current-variant-price');
+  var currentVariantPrice = 0;
+  if (currentVariantPriceEl && !currentVariantPriceEl.value.includes('\x7B\x7B')) {
+    currentVariantPrice = parseInt(currentVariantPriceEl.value, 10) || 0;
+  }
+
+  var productJsonEl  = document.getElementById('ProductJson-{{ section.id }}');
+  var productVariants = [];
+  try { 
+    var pStr = productJsonEl ? productJsonEl.innerHTML.trim() : '';
+    if (pStr && !pStr.includes('\x7B\x7B')) {
+      productVariants = JSON.parse(pStr); 
+    }
+  } catch(e) { productVariants = []; }
+
+  var canvas = new fabric.Canvas('design-canvas', {
+    width: CANVAS_W,
+    height: CANVAS_H,
+    selection: true,
+    preserveObjectStacking: true
+  });
+
+  /* ─── CENTER SNAPPING LOGIC ─────────────────────────────── */
+  canvas.on('object:moving', function(options) { 
+    if(!isBannerMode) return;
+    
+    var obj = options.target;
+    const snapDist = 15;
+    const centerX = window.baseVisualWidth / 2;
+    const centerY = window.baseVisualHeight / 2;
+    if (Math.abs(obj.left - centerX) < snapDist) obj.set({ left: centerX });
+    if (Math.abs(obj.top - centerY) < snapDist) obj.set({ top: centerY });
+  });
+
+  /* ─── Advanced ApparelText Class (Gradient Support Added) ──────────────── */
+  fabric.ApparelText = fabric.util.createClass(fabric.Object, {
+    type: 'apparelText',
+    stateProperties: fabric.Object.prototype.stateProperties.concat([
+      'text', 'effect', 'intensity', 'spacing', 'fontFamily', 'fontSize', 'fill', 'fontWeight', 'fontStyle', 'textAlign', 'stroke', 'strokeWidth', 'shadow', 'name'
+    ]),
+
+    initialize: function(text, options) {
+      options = options || {};
+      this.text      = text || 'Your Text';
+      this.effect    = options.effect || 'normal';
+      this.intensity = options.intensity !== undefined ? options.intensity : 120;
+      this.spacing   = options.spacing || 0;
+      this.fontFamily = options.fontFamily || 'Arial';
+      this.fontSize  = options.fontSize || 45;
+      this.fontWeight = options.fontWeight || 'bold';
+      this.fontStyle  = options.fontStyle || 'normal';
+      this.fill      = options.fill || '#121212';
+      this.stroke    = options.stroke || null;
+      this.strokeWidth = options.strokeWidth || 0;
+      this.shadow    = options.shadow || null;
+      this.name      = options.name || '';
+      this.callSuper('initialize', options);
+      this._calcBounds();
+    },
+
+    _getFontString: function() {
+      return (this.fontStyle || 'normal') + ' ' + (this.fontWeight || 'normal') + ' ' + this.fontSize + 'px ' + this.fontFamily;
+    },
+
+    _measureChars: function(ctx) {
+       ctx.font = this._getFontString();
+       var chars = this.text ? this.text.split('') : [];
+       var widths = chars.map(function(c) { return ctx.measureText(c).width; });
+       return { chars: chars, widths: widths };
+    },
+
+    _calcBounds: function() {
+       var c = document.createElement('canvas').getContext('2d');
+       var m = this._measureChars(c);
+       var tw = 0;
+       m.widths.forEach(w => tw += w + this.spacing);
+       tw = Math.max(1, tw - this.spacing);
+
+       var strokePad = this.strokeWidth || 0;
+
+       if (this.effect === 'curve' || this.effect === 'arch') {
+           var radius = 2000 / Math.max(1, (this.intensity / 10));
+           if (this.effect === 'curve') radius = -radius; 
+           
+           var absRadius = Math.abs(radius);
+           var totalAngle = tw / absRadius;
+           var halfAngle = totalAngle / 2;
+           var top = -absRadius - this.fontSize;
+           var bottom = Math.sin(halfAngle) * absRadius + this.fontSize;
+           var left = -Math.cos(halfAngle) * absRadius - this.fontSize;
+           var right = Math.cos(halfAngle) * absRadius + this.fontSize;
+           this.set({ width: Math.abs(left)+Math.abs(right) + strokePad, height: Math.abs(top)+Math.abs(bottom) + strokePad });
+           this._curveRadius = radius;
+       } else {
+           var maxScaleY = 1;
+           var maxOffsetY = 0;
+           var amt = this.intensity / 150;
+           
+           if (this.effect === 'bulge' || this.effect === 'perspective') maxScaleY = 1 + amt;
+           if (this.effect === 'bridge' || this.effect === 'valley' || this.effect === 'pointed' || this.effect === 'upward' || this.effect === 'downward') {
+               maxOffsetY = (amt * this.fontSize);
+           }
+           
+           this.set({ 
+               width: tw + strokePad, 
+               height: (this.fontSize * maxScaleY) + Math.abs(maxOffsetY) + strokePad 
+           });
+       }
+    },
+
+    _render: function(ctx) {
+       if (!this.text) return;
+       ctx.font = this._getFontString();
+       ctx.textAlign = 'center';
+       ctx.textBaseline = 'middle';
+       
+       var chars = this.text.split('');
+       var charWidths = chars.map(c => ctx.measureText(c).width);
+       var tw = charWidths.reduce((a,b) => a + b + this.spacing, 0) - this.spacing;
+
+       if (this.shadow) {
+           ctx.shadowColor = this.shadow.color;
+           ctx.shadowBlur = this.shadow.blur;
+           ctx.shadowOffsetX = this.shadow.offsetX;
+           ctx.shadowOffsetY = this.shadow.offsetY;
+       } else {
+           ctx.shadowColor = 'transparent';
+       }
+
+       // Parse Gradient for custom drawing if applied
+       var fillValue = this.fill;
+       if (fillValue && fillValue.toLive) fillValue = fillValue.toLive(ctx, this);
+
+       if (this.effect === 'curve' || this.effect === 'arch') {
+           var r = Math.abs(this._curveRadius || 200);
+           var isReverse = (this._curveRadius < 0);
+           var totalAngle = tw / r;
+           var startAngle = isReverse ? (Math.PI/2 + totalAngle/2) : (-Math.PI/2 - totalAngle/2);
+           var curAngle = startAngle;
+
+           for (var i=0; i<chars.length; i++) {
+               var cAngle = charWidths[i]/r;
+               var mAngle = isReverse ? (curAngle - cAngle/2) : (curAngle + cAngle/2);
+               ctx.save();
+               ctx.translate(Math.cos(mAngle)*r, Math.sin(mAngle)*r);
+               ctx.rotate(isReverse ? mAngle - Math.PI/2 : mAngle + Math.PI/2);
+               if (this.stroke && this.stroke !== 'transparent') {
+                   ctx.strokeStyle = this.stroke; ctx.lineWidth = this.strokeWidth;
+                   ctx.lineJoin = 'round'; ctx.strokeText(chars[i], 0, 0);
+               }
+               ctx.fillStyle = fillValue; ctx.fillText(chars[i], 0, 0);
+               ctx.restore();
+               curAngle = isReverse ? (curAngle - cAngle - this.spacing/r) : (curAngle + cAngle + this.spacing/r);
+           }
+       } else {
+           var len = chars.length;
+           var center = (len - 1) / 2;
+           var amt = this.intensity / 150; 
+           
+           ctx.save();
+           ctx.translate(-tw/2, 0); 
+           var curX = 0;
+           for (var i=0; i<len; i++) {
+               var norm = len > 1 ? (i / (len - 1)) : 0; 
+               var dist = len > 1 ? Math.abs(i - center) / center : 0; 
+               var scaleY = 1, scaleX = 1, offsetY = 0;
+
+               switch(this.effect) {
+                   case 'pinch': scaleY = 1 - ((1 - dist) * (amt * 0.4)); break;
+                   case 'bulge': scaleY = 1 + ((1 - dist) * (amt * 0.6)); break;
+                   case 'bridge': offsetY = -Math.sin(norm * Math.PI) * (amt * this.fontSize * 0.8); break;
+                   case 'valley': offsetY = Math.sin(norm * Math.PI) * (amt * this.fontSize * 0.8); break;
+                   case 'pointed': offsetY = -(1 - dist) * (amt * this.fontSize * 0.8); break;
+                   case 'cone': scaleY = 1 - (norm * amt * 0.5); break;
+                   case 'upward': offsetY = -norm * (amt * this.fontSize); break;
+                   case 'downward': offsetY = norm * (amt * this.fontSize); break;
+                   case 'perspective': scaleY = 1 + (norm * amt); scaleX = 1 + (norm * amt * 0.2); break;
+               }
+
+               ctx.save();
+               ctx.translate(curX + charWidths[i]/2, offsetY);
+               ctx.scale(scaleX, scaleY);
+               
+               if (this.stroke && this.stroke !== 'transparent') {
+                   ctx.strokeStyle = this.stroke; ctx.lineWidth = this.strokeWidth;
+                   ctx.lineJoin = 'round'; ctx.strokeText(chars[i], 0, 0);
+               }
+               ctx.fillStyle = fillValue; ctx.fillText(chars[i], 0, 0);
+               ctx.restore();
+
+               curX += charWidths[i] + this.spacing;
+           }
+           ctx.restore();
+       }
+    }
+  });
+
+  fabric.ApparelText.fromObject = function(object, callback) {
+    var instance = new fabric.ApparelText(object.text, object);
+    if (typeof callback === 'function') { callback(instance); }
+    return instance;
+  };
+
+  /* CUSTOM FABRIC.JS CONTROLS */
+  fabric.Object.prototype.set({
+      transparentCorners: false,
+      borderColor: '#ffffff',
+      borderScaleFactor: 2,
+      cornerStyle: 'circle',
+      cornerColor: '#ffffff',
+      cornerStrokeColor: '#2563eb',
+      cornerSize: 30,
+      padding: 5
+  });
+
+  var deleteImg = document.createElement('img');
+  deleteImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='11' stroke='none'/%3E%3Cpath d='M15 9l-6 6M9 9l6 6' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+
+  var cloneImg = document.createElement('img');
+  cloneImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='11' stroke='none'/%3E%3Crect x='10' y='10' width='6' height='6' rx='1' stroke='%232563eb' stroke-width='2' fill='none'/%3E%3Cpath d='M7 14H6a1 1 0 01-1-1V6a1 1 0 011-1h6a1 1 0 011 1v1' stroke='%232563eb' stroke-width='2' fill='none'/%3E%3C/svg%3E";
+
+  var rotateImg = document.createElement('img');
+  rotateImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='11' stroke='none'/%3E%3Cpath d='M19 11A7.5 7.5 0 0 0 5 9M4.5 9h4M4.5 9V4.5' stroke='%232563eb' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3C/svg%3E";
+
+  var scaleImg = document.createElement('img');
+  scaleImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='11' stroke='none'/%3E%3Cpath d='M16 8l-4 4m4-4v4m0-4h-4M8 16l4-4m-4 4v-4m0 4h4' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E";
+
+  function renderCustomIcon(ctx, left, top, styleOverride, fabricObject, iconObj) {
+      var size = this.cornerSize;
+      ctx.save();
+      ctx.translate(left, top);
+      ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+      ctx.drawImage(iconObj, -size/2, -size/2, size, size);
+      ctx.restore();
+  }
+
+  fabric.Object.prototype.controls.tl = new fabric.Control({
+      x: -0.5, y: -0.5, cursorStyle: 'pointer',
+      mouseUpHandler: function(eventData, transform) {
+          var target = transform.target;
+          var canvas = target.canvas;
+          
+          // Clear variables if deleted
+          if(target.name === 'jersey_name') { jerseyNameObj = null; document.getElementById('enable-names').checked = false; }
+          if(target.name === 'jersey_number') { jerseyNumberObj = null; document.getElementById('enable-numbers').checked = false; }
+          
+          canvas.remove(target);
+          canvas.requestRenderAll();
+          saveHistory();
+          return true;
+      },
+      render: function(ctx, left, top, styleOverride, fabricObject) {
+          renderCustomIcon.call(this, ctx, left, top, styleOverride, fabricObject, deleteImg);
+      },
+      cornerSize: 30
+  });
+
+  fabric.Object.prototype.controls.bl = new fabric.Control({
+      x: -0.5, y: 0.5, cursorStyle: 'pointer',
+      mouseUpHandler: function(eventData, transform) {
+          var target = transform.target;
+          var canvas = target.canvas;
+          target.clone(function(cloned) {
+              cloned.set({ left: target.left + 20, top: target.top + 20, evented: true, name: '' }); // Unset special name for clone
+              if (cloned.type === 'activeSelection') {
+                  cloned.canvas = canvas;
+                  cloned.forEachObject(function(obj) { canvas.add(obj); });
+                  cloned.setCoords();
+              } else {
+                  canvas.add(cloned);
+              }
+              canvas.setActiveObject(cloned);
+              canvas.requestRenderAll();
+              saveHistory();
+          }, CUSTOM_PROPS);
+          return true;
+      },
+      render: function(ctx, left, top, styleOverride, fabricObject) {
+          renderCustomIcon.call(this, ctx, left, top, styleOverride, fabricObject, cloneImg);
+      },
+      cornerSize: 30
+  });
+
+  fabric.Object.prototype.controls.tr = new fabric.Control({
+      x: 0.5, y: -0.5, cursorStyle: 'crosshair',
+      actionHandler: fabric.controlsUtils.rotationWithSnapping,
+      actionName: 'rotate',
+      render: function(ctx, left, top, styleOverride, fabricObject) {
+          renderCustomIcon.call(this, ctx, left, top, styleOverride, fabricObject, rotateImg);
+      },
+      cornerSize: 30
+  });
+
+  fabric.Object.prototype.controls.br = new fabric.Control({
+      x: 0.5, y: 0.5, cursorStyle: 'nwse-resize',
+      actionHandler: fabric.controlsUtils.scalingEqually,
+      actionName: 'scale',
+      render: function(ctx, left, top, styleOverride, fabricObject) {
+          renderCustomIcon.call(this, ctx, left, top, styleOverride, fabricObject, scaleImg);
+      },
+      cornerSize: 30
+  });
+
+  fabric.Object.prototype.controls.mtr.visible = false;
+
+  ['mt', 'mb', 'ml', 'mr'].forEach(function(pos) {
+      var ctrl = fabric.Object.prototype.controls[pos];
+      if (ctrl) {
+          ctrl.visible = true;
+          ctrl.transparentCorners = false;
+          ctrl.cornerColor = '#ffffff';
+          ctrl.cornerStrokeColor = '#9ca3af';
+          ctrl.cornerSize = 10;
+          ctrl.cornerStyle = 'rect';
+      }
+  });
+
+
+  /* ─── Layers Panel Logic ─────────────────────────────── */
+  function updateLayersPanel() {
+    var list = document.getElementById('layers-list');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    var objects = canvas.getObjects();
+    if (objects.length === 0) {
+      list.innerHTML = '<p style="font-size:12px; color:var(--color-muted); text-align:center; padding:10px;">No elements added.</p>';
+      return;
+    }
+    
+    for (var i = objects.length - 1; i >= 0; i--) {
+      var obj = objects[i];
+      var div = document.createElement('div');
+      var isActive = (canvas.getActiveObject() === obj) ? 'active' : '';
+      div.className = 'layer-item ' + isActive;
+      
+      div.onclick = (function(o) {
+        return function() {
+          canvas.setActiveObject(o);
+          canvas.renderAll();
+          updateLayersPanel();
+        };
+      })(obj);
+
+      var label = obj.type;
+      var icon = '<i class="fa-solid fa-shapes"></i>';
+      if (obj.type === 'i-text' || obj.type === 'apparelText') { 
+        label = obj.name === 'jersey_name' ? 'Jersey Name' : (obj.name === 'jersey_number' ? 'Jersey Number' : 'Text: ' + (obj.text.substring(0, 10) || '...')); 
+        icon = '<i class="fa-solid fa-font"></i>'; 
+      }
+      if (obj.type === 'image') { label = 'Image'; icon = '<i class="fa-regular fa-image"></i>'; }
+
+      div.innerHTML = 
+        '<div style="display:flex; align-items:center; gap:8px; overflow:hidden;">' +
+          '<span style="color:var(--color-muted); font-size:14px;">' + icon + '</span>' +
+          '<span class="layer-info">' + label + '</span>' +
+        '</div>' +
+        '<div class="layer-actions">' +
+          '<button class="layer-btn" title="Bring Forward" onclick="moveLayerObj(event, ' + i + ', \'up\')"><i class="fa-solid fa-arrow-up"></i></button>' +
+          '<button class="layer-btn" title="Send Backward" onclick="moveLayerObj(event, ' + i + ', \'down\')"><i class="fa-solid fa-arrow-down"></i></button>' +
+          '<button class="layer-btn" style="color:#dc2626;" title="Delete" onclick="deleteLayerObj(event, ' + i + ')"><i class="fa-solid fa-trash"></i></button>' +
+        '</div>';
+      list.appendChild(div);
+    }
+  }
+
+  function moveLayerObj(e, index, dir) {
+    e.stopPropagation();
+    var objects = canvas.getObjects();
+    var obj = objects[index];
+    if (dir === 'up') {
+      canvas.bringForward(obj);
+    } else {
+      canvas.sendBackwards(obj);
+    }
+    canvas.renderAll();
+    saveHistory();
+    updateLayersPanel();
+  }
+  window.moveLayerObj = moveLayerObj;
+
+  function deleteLayerObj(e, index) {
+    e.stopPropagation();
+    var objects = canvas.getObjects();
+    var obj = objects[index];
+    if(obj.name === 'jersey_name') { jerseyNameObj = null; document.getElementById('enable-names').checked = false; }
+    if(obj.name === 'jersey_number') { jerseyNumberObj = null; document.getElementById('enable-numbers').checked = false; }
+    canvas.remove(obj);
+    canvas.discardActiveObject();
+    canvas.renderAll();
+    saveHistory();
+    updateLayersPanel();
+  }
+  window.deleteLayerObj = deleteLayerObj;
+
+  canvas.on('object:added', updateLayersPanel);
+  canvas.on('object:removed', updateLayersPanel);
+  canvas.on('selection:created', function() { updateLayersPanel(); syncPropsToUI(); });
+  canvas.on('selection:updated', function() { updateLayersPanel(); syncPropsToUI(); });
+  canvas.on('selection:cleared', function() { updateLayersPanel(); document.getElementById('image-properties-wrapper').classList.add('hidden'); });
+
+  /* ─── Alignment Functions ───────────────────────── */
+  function alignObj(direction) {
+      var obj = getActiveDesignObj();
+      if(!obj) return;
+      if (direction === 'center') {
+          obj.centerH();
+      } else if (direction === 'left') {
+          obj.set({ left: (obj.width * obj.scaleX) / 2 });
+      } else if (direction === 'right') {
+          obj.set({ left: canvas.width - (obj.width * obj.scaleX) / 2 });
+      }
+      obj.setCoords();
+      canvas.renderAll();
+      saveHistory();
+  }
+  window.alignObj = alignObj;
+
+  /* ─── Unit Conversion & Ruler Logic ──────────────────── */
+  // Initial global state for physical units
+  window.currentPhysWidth = 120;
+  window.currentPhysHeight = 60;
+  window.currentPhysUnit = 'in';
+
+  function applyZoomAndSize() {
+      canvas.setZoom(window.currentZoom);
+      let finalW = window.baseVisualWidth * window.currentZoom;
+      let finalH = window.baseVisualHeight * window.currentZoom;
+      
+      canvas.setWidth(finalW);
+      canvas.setHeight(finalH);
+      
+      const wrapper = document.getElementById('canvas-ruler-wrapper');
+      wrapper.style.width = finalW + 'px';
+      wrapper.style.height = finalH + 'px';
+
+      canvas.renderAll();
+
+      // Redraw rulers with scaled (zoomed) dimensions automatically
+      if (isBannerMode && window.currentPhysWidth) {
+          drawRulers(window.currentPhysWidth, window.currentPhysHeight, window.currentPhysUnit, finalW, finalH);
+      }
+  }
+  
+  function changeZoom(amount) {
+      window.currentZoom += amount;
+      if(window.currentZoom < 0.5) window.currentZoom = 0.5;
+      if(window.currentZoom > 3) window.currentZoom = 3;
+      document.getElementById('zoom-level').innerText = Math.round(window.currentZoom * 100) + '%';
+      applyZoomAndSize();
+  }
+  window.changeZoom = changeZoom;
+
+  function convertValue(val, fromUnit, toUnit) {
+      let inches = val;
+      if(fromUnit === 'ft') inches = val * 12;
+      if(fromUnit === 'm') inches = val * 39.3701;
+      
+      if(toUnit === 'in') return inches;
+      if(toUnit === 'ft') return inches / 12;
+      if(toUnit === 'm') return inches / 39.3701;
+      return val;
+  }
+
+  function updateCanvasRatio() {
+      let widthInput = document.getElementById('phys-width').value;
+      let heightInput = document.getElementById('phys-height').value;
+      if(!widthInput || !heightInput) return;
+
+      let pW = parseFloat(widthInput);
+      let pH = parseFloat(heightInput);
+      let unit = document.getElementById('phys-unit').value;
+
+      // Update globals so zoom function can use them
+      window.currentPhysWidth = pW;
+      window.currentPhysHeight = pH;
+      window.currentPhysUnit = unit;
+
+      let in_W = convertValue(pW, unit, 'in').toFixed(2);
+      let in_H = convertValue(pH, unit, 'in').toFixed(2);
+      let ft_W = convertValue(pW, unit, 'ft').toFixed(2);
+      let ft_H = convertValue(pH, unit, 'ft').toFixed(2);
+      let m_W = convertValue(pW, unit, 'm').toFixed(2);
+      let m_H = convertValue(pH, unit, 'm').toFixed(2);
+
+      let convHTML = `<strong>Equivalent Size:</strong><br>`;
+      if(unit !== 'in') convHTML += `Inches: ${in_W} in × ${in_H} in<br>`;
+      if(unit !== 'ft') convHTML += `Feet: ${ft_W} ft × ${ft_H} ft<br>`;
+      if(unit !== 'm') convHTML += `Meters: ${m_W} m × ${m_H} m`;
+      
+      document.getElementById('conversion-display').innerHTML = convHTML;
+
+      const MAX_VISUAL_WIDTH = 800;
+      const MAX_VISUAL_HEIGHT = 500;
+      const aspect_ratio = pW / pH;
+
+      let newVisualW = MAX_VISUAL_WIDTH;
+      let newVisualH = MAX_VISUAL_WIDTH / aspect_ratio;
+
+      if (newVisualH > MAX_VISUAL_HEIGHT) {
+          newVisualH = MAX_VISUAL_HEIGHT;
+          newVisualW = MAX_VISUAL_HEIGHT * aspect_ratio;
+      }
+
+      window.baseVisualWidth = newVisualW;
+      window.baseVisualHeight = newVisualH;
+
+      applyZoomAndSize(); // This will naturally calculate scale and redraw rulers
+  }
+  window.updateCanvasRatio = updateCanvasRatio;
+
+  function drawRulers(pW, pH, unit, vW, vH) {
+      const topRuler = document.getElementById('ruler-top');
+      const leftRuler = document.getElementById('ruler-left');
+      if(!topRuler || !leftRuler) return;
+      topRuler.innerHTML = ''; leftRuler.innerHTML = '';
+
+      const pxPerUnitX = vW / pW; 
+      const pxPerUnitY = vH / pH;
+
+      let interval = 1;
+      if (pW > 200) interval = 10;
+      if (pW > 1000) interval = 50;
+
+      for(let i=0; i <= pW; i += interval) {
+          let pos = i * pxPerUnitX;
+          let tick = document.createElement('div');
+          tick.className = 'ruler-tick';
+          tick.style.left = pos + 'px';
+          tick.style.bottom = '0';
+          tick.style.width = '1px';
+          tick.style.height = (i % (interval*5) === 0) ? '100%' : '30%';
+          topRuler.appendChild(tick);
+
+          if(i % (interval*5) === 0) {
+              let label = document.createElement('div');
+              label.className = 'ruler-label';
+              label.innerText = i;
+              label.style.left = (pos + 2) + 'px';
+              label.style.top = '0';
+              topRuler.appendChild(label);
+          }
+      }
+
+      for(let i=0; i <= pH; i += interval) {
+          let pos = i * pxPerUnitY;
+          let tick = document.createElement('div');
+          tick.className = 'ruler-tick';
+          tick.style.top = pos + 'px';
+          tick.style.right = '0';
+          tick.style.height = '1px';
+          tick.style.width = (i % (interval*5) === 0) ? '100%' : '30%';
+          leftRuler.appendChild(tick);
+
+          if(i % (interval*5) === 0 && i !== 0) {
+              let label = document.createElement('div');
+              label.className = 'ruler-label';
+              label.innerText = i;
+              label.style.top = (pos - 12) + 'px';
+              label.style.left = '2px';
+              label.style.transform = 'rotate(-90deg)';
+              leftRuler.appendChild(label);
+          }
+      }
+  }
+
+  function setCanvasMode(mode) {
+      isBannerMode = (mode === 'banner');
+      document.getElementById('mode-apparel').style.background = isBannerMode ? '#f9fafb' : 'var(--color-accent)';
+      document.getElementById('mode-apparel').style.color = isBannerMode ? 'var(--color-txt)' : '#fff';
+      document.getElementById('mode-banner').style.background = isBannerMode ? 'var(--color-accent)' : '#f9fafb';
+      document.getElementById('mode-banner').style.color = isBannerMode ? '#fff' : 'var(--color-txt)';
+      
+      var bannerTools = document.getElementById('banner-tools');
+      var viewPill = document.getElementById('dynamic-view-pill');
+      var topRuler = document.getElementById('ruler-top');
+      var leftRuler = document.getElementById('ruler-left');
+      
+      if (isBannerMode) {
+          bannerTools.classList.remove('hidden');
+          if(viewPill) viewPill.classList.add('hidden');
+          if(topRuler) topRuler.style.display = 'block';
+          if(leftRuler) leftRuler.style.display = 'block';
+          
+          updateCanvasRatio();
+          canvas.backgroundImage = null;
+          
+          // Re-apply gradient or solid canvas background
+          var gradColor1 = document.getElementById('grad-color-1').value;
+          var gradColor2 = document.getElementById('grad-color-2').value;
+          var usingGradient = document.getElementById('tab-gradient').style.color === 'var(--color-accent)';
+          
+          if(usingGradient && colorTargetType === 'canvasBg') {
+              applyGradient(); 
+          } else {
+              canvas.backgroundColor = document.getElementById('canvas-bg-color-val').value;
+          }
+      } else {
+          bannerTools.classList.add('hidden');
+          if(viewPill) viewPill.classList.remove('hidden');
+          if(topRuler) topRuler.style.display = 'none';
+          if(leftRuler) leftRuler.style.display = 'none';
+          
+          window.baseVisualWidth = 600; 
+          window.baseVisualHeight = 700;
+          applyZoomAndSize();
+
+          canvas.backgroundColor = null;
+          setProductBackground(currentBgUrl);
+      }
+      canvas.renderAll();
+  }
+  window.setCanvasMode = setCanvasMode;
+
+
+  /* ─── Background image ───────────────────────────────── */
+  function setProductBackground(imageUrl) {
+    if (isBannerMode) return; 
+    if (!imageUrl) return;
+    if (imageUrl.charAt(0) === '/' && imageUrl.charAt(1) === '/') imageUrl = 'https:' + imageUrl;
+    fabric.Image.fromURL(imageUrl, function(img) {
+      if (!img) return;
+      var scaleFactor = Math.min(CANVAS_W / img.width, CANVAS_H / img.height);
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+        originX:     'center',
+        originY:     'center',
+        left:        CANVAS_W / 2,
+        top:         CANVAS_H / 2,
+        scaleX:      scaleFactor,
+        scaleY:      scaleFactor,
+        crossOrigin: 'anonymous'
+      });
+    }, { crossOrigin: 'anonymous' });
+  }
+
+  function getImageUrlForVariantAndView(colorName, viewName) {
+    if (!viewName) return null;
+
+    var targetColor = colorName ? colorName.toLowerCase().trim() : "";
+    var targetView = viewName ? viewName.toLowerCase().trim() : "";
+
+    function cleanAndSplit(str) {
+       if (!str) return [];
+       return str.toLowerCase().replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(Boolean);
+    }
+
+    var colorWords = cleanAndSplit(targetColor);
+    var viewWords = cleanAndSplit(targetView);
+    var looseMatchUrl = null; 
+
+    for (var i = 0; i < productMedia.length; i++) {
+      var altText = productMedia[i].alt;
+      
+      if (altText && typeof altText === 'string') {
+        var cleanAltText = altText.toLowerCase();
+
+        var hasColor = true;
+        if (colorWords.length > 0) {
+            hasColor = colorWords.every(function(word) {
+                return cleanAltText.includes(word);
+            });
+        }
+
+        var hasView = true;
+        if (viewWords.length > 0) {
+            hasView = viewWords.every(function(word) {
+                return cleanAltText.includes(word);
+            });
+        }
+        
+        if (hasColor && hasView) { return productMedia[i].url; }
+
+        if (!hasColor && hasView && !looseMatchUrl) {
+           looseMatchUrl = productMedia[i].url;
+        }
+      }
+    }
+    
+    if (looseMatchUrl) { return looseMatchUrl; }
+    return null; 
+  }
+
+  /* ─── NEW: INTEGRATED NAMES & NUMBERS LOGIC ──────────── */
+  function toggleJerseyElement(type) {
+    if (type === 'name') {
+      var enableName = document.getElementById('enable-names').checked;
+      if (enableName) {
+        if (!jerseyNameObj) {
+            var nameFont = document.getElementById('name-font-style') ? document.getElementById('name-font-style').value : 'Arial';
+            jerseyNameObj = new fabric.ApparelText('NAME', {
+              left: window.baseVisualWidth / 2, 
+              top: window.baseVisualHeight * 0.25, 
+              originX: 'center', 
+              originY: 'center',
+              fontFamily: nameFont, fontSize: 50, fill: '#121212',
+              fontWeight: 'bold', name: 'jersey_name'
+            });
+            canvas.add(jerseyNameObj);
+        }
+      } else {
+        if (jerseyNameObj) {
+            canvas.remove(jerseyNameObj);
+            jerseyNameObj = null;
+        }
+      }
+    } else if (type === 'number') {
+      var enableNum = document.getElementById('enable-numbers').checked;
+      if (enableNum) {
+        if (!jerseyNumberObj) {
+            var numFont = document.getElementById('number-font-style') ? document.getElementById('number-font-style').value : 'Arial';
+            jerseyNumberObj = new fabric.ApparelText('00', {
+              left: window.baseVisualWidth / 2, 
+              top: window.baseVisualHeight * 0.45, 
+              originX: 'center', 
+              originY: 'center',
+              fontFamily: numFont, fontSize: 140, fill: '#121212',
+              fontWeight: 'bold', name: 'jersey_number'
+            });
+            canvas.add(jerseyNumberObj);
+        }
+      } else {
+        if (jerseyNumberObj) {
+            canvas.remove(jerseyNumberObj);
+            jerseyNumberObj = null;
+        }
+      }
+    }
+    updateJerseyVisuals();
+    updateSubtotal();
+    saveHistory();
+  }
+  window.toggleJerseyElement = toggleJerseyElement;
+
+  function updateJerseyVisuals() {
+    var nSide = document.getElementById('name-side').value.toLowerCase();
+    var numSide = document.getElementById('number-side').value.toLowerCase();
+    var nH = parseFloat(document.getElementById('name-height').value) || 2;
+    var numH = parseFloat(document.getElementById('number-height').value) || 8;
+    
+    var nameFont = document.getElementById('name-font-style') ? document.getElementById('name-font-style').value : 'Arial';
+    var numFont = document.getElementById('number-font-style') ? document.getElementById('number-font-style').value : 'Arial';
+
+    if (jerseyNameObj) {
+      jerseyNameObj.visible = (nSide === currentArea);
+      jerseyNameObj.set('fontSize', nH * 25); // Roughly visual scaling
+      jerseyNameObj.set('fontFamily', nameFont);
+      jerseyNameObj._calcBounds();
+    }
+    if (jerseyNumberObj) {
+      jerseyNumberObj.visible = (numSide === currentArea);
+      jerseyNumberObj.set('fontSize', numH * 18);
+      jerseyNumberObj.set('fontFamily', numFont);
+      jerseyNumberObj._calcBounds();
+    }
+    canvas.renderAll();
+  }
+  window.updateJerseyVisuals = updateJerseyVisuals;
+
+  /* TEAM ROSTER MODAL LOGIC */
+  function openTeamModal() {
+    document.getElementById('team-modal').classList.remove('hidden');
+    renderRosterInputs();
+  }
+  window.openTeamModal = openTeamModal;
+
+  function closeTeamModal() {
+    document.getElementById('team-modal').classList.add('hidden');
+    updateRosterSummary();
+  }
+  window.closeTeamModal = closeTeamModal;
+
+  function addPlayerRow() {
+    roster.push({ name: '', number: '', size: 'L' });
+    renderRosterInputs();
+  }
+  window.addPlayerRow = addPlayerRow;
+
+  function removePlayerRow(index) {
+    roster.splice(index, 1);
+    if(roster.length === 0) roster.push({ name: '', number: '', size: 'L' });
+    renderRosterInputs();
+  }
+  window.removePlayerRow = removePlayerRow;
+
+  function clearRoster() {
+      roster = [{ name: '', number: '', size: 'L' }];
+      renderRosterInputs();
+  }
+  window.clearRoster = clearRoster;
+
+  function updatePlayer(index, field, value) {
+    roster[index][field] = value;
+    updateRosterSummary();
+  }
+  window.updatePlayer = updatePlayer;
+
+  function renderRosterInputs() {
+    var container = document.getElementById('team-input-body');
+    container.innerHTML = '';
+    roster.forEach(function(p, i) {
+      var row = document.createElement('tr');
+      row.innerHTML = 
+        '<td><input type="text" class="input-table-cell" value="' + p.name + '" oninput="updatePlayer(' + i + ', \'name\', this.value)" placeholder="Enter Name"></td>' +
+        '<td><input type="text" class="input-table-cell" value="' + p.number + '" oninput="updatePlayer(' + i + ', \'number\', this.value)" placeholder="00"></td>' +
+        '<td><input type="text" class="input-table-cell" value="' + p.size + '" oninput="updatePlayer(' + i + ', \'size\', this.value)" placeholder="Size"></td>' +
+        '<td><button class="layer-btn" style="color:red;" onclick="removePlayerRow(' + i + ')"><i class="fa-solid fa-xmark"></i></button></td>';
+      container.appendChild(row);
+    });
+    updateRosterSummary();
+  }
+
+  function updateRosterSummary() {
+    var validRosterCount = roster.filter(p => p.name || p.number).length;
+    var sizes = {};
+    
+    roster.forEach(p => {
+        if(p.name || p.number) {
+            if(p.size) sizes[p.size] = (sizes[p.size] || 0) + 1;
+        }
+    });
+
+    document.getElementById('sum-items').innerText = validRosterCount;
+    var sizeStr = Object.keys(sizes).map(s => '(' + sizes[s] + ') ' + s).join(', ');
+    document.getElementById('sum-sizes').innerText = sizeStr || '-';
+
+    updateSubtotal();
+  }
+
+
+  /* ─── Subtotal & Quantity Logic ──────────────────────── */
+  function changeQty(delta) {
+    var input = document.getElementById('quantity');
+    // Allow manual change only if not using team roster
+    var validRosterCount = roster.filter(p => p.name || p.number).length;
+    if (validRosterCount > 0) {
+        showToast("Quantity is locked while Team List is active. Clear list to change manually.", "error");
+        return;
+    }
+
+    var val = parseInt(input.value, 10) || 1;
+    val += delta;
+    if (val < 1) val = 1;
+    if (val > 999) val = 999;
+    input.value = val;
+    updateSubtotal();
+  }
+  window.changeQty = changeQty;
+
+  function updateSubtotal() {
+    var validRosterCount = roster.filter(p => p.name || p.number).length;
+    var qtyInput = document.getElementById('quantity');
+    
+    // Automatically set quantity to roster count if active
+    var isTeamMode = validRosterCount > 0;
+    var qty = isTeamMode ? validRosterCount : (parseInt(qtyInput.value, 10) || 1);
+    
+    if(isTeamMode) {
+        qtyInput.value = qty;
+        qtyInput.setAttribute('readonly', 'true');
+        document.getElementById('multiplier-display').innerText = qty;
+    } else {
+        qtyInput.removeAttribute('readonly');
+        document.getElementById('multiplier-display').innerText = qty;
+    }
+
+    var baseTotal = currentVariantPrice * qty;
+    var addonsTotal = 0;
+    var addonCount = 0;
+    var printExtraTotal = 0;
+
+    // Calculate regular checkbox extras
+    document.querySelectorAll('.addon-checkbox:checked').forEach(function(cb) {
+      addonsTotal += (parseInt(cb.getAttribute('data-price') || '0', 10) * qty);
+      addonCount++;
+    });
+
+    // Calculate Printing Costs (Names & Numbers)
+    if (document.getElementById('enable-names') && document.getElementById('enable-names').checked) {
+        printExtraTotal += (COST_PRINT_NAME * qty);
+    }
+    if (document.getElementById('enable-numbers') && document.getElementById('enable-numbers').checked) {
+        printExtraTotal += (COST_PRINT_NUMBER * qty);
+    }
+
+    var finalTotal = baseTotal + addonsTotal + printExtraTotal;
+    
+    document.getElementById('summary-base-price').innerHTML = formatMoney(baseTotal);
+    document.getElementById('addon-label').innerText = 'Extras (' + addonCount + ')';
+    document.getElementById('summary-addon-price').innerHTML = '+' + formatMoney(addonsTotal);
+    document.getElementById('summary-print-price').innerHTML = '+' + formatMoney(printExtraTotal);
+    document.getElementById('subtotal-display').innerHTML = formatMoney(finalTotal);
+
+    // Update Right Sidebar Preview
+    var rosterPrev = document.getElementById('roster-preview-sidebar');
+    if (validRosterCount === 0) {
+      rosterPrev.innerText = 'Single item selected. No team roster active.';
+    } else {
+      rosterPrev.innerHTML = roster.filter(p => p.name || p.number).map(p => '<div><strong>' + (p.name || '-') + '</strong> (#' + (p.number || '-') + ') - Size: ' + p.size + '</div>').join('');
+    }
+  }
+  window.updateSubtotal = updateSubtotal;
+
+  var currentSelectedOptions = [];
+  function initVariantState() {
+    document.querySelectorAll('.variant-option-group').forEach(function(group, index) {
+      var activeBtn = group.querySelector('.variant-btn.active');
+      if (activeBtn) {
+        currentSelectedOptions[index] = activeBtn.getAttribute('data-value');
+      }
+    });
+  }
+
+  function handleVariantClick(e) {
+    var btn = e.currentTarget;
+    var optIndex = parseInt(btn.getAttribute('data-option-index'), 10);
+    var val = btn.getAttribute('data-value');
+
+    currentSelectedOptions[optIndex] = val;
+
+    var group = btn.closest('.option-values');
+    group.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    findAndUpdateVariant();
+  }
+
+  function findAndUpdateVariant() {
+    if (productVariants.length === 0) return;
+
+    var matchedVariant = productVariants.find(function(v) {
+      return v.options.every(function(opt, i) { return opt === currentSelectedOptions[i]; });
+    });
+
+    if (!matchedVariant) {
+      matchedVariant = productVariants.find(function(v) {
+        return v.options[0] === currentSelectedOptions[0] && v.available; 
+      });
+      if (matchedVariant) {
+        currentSelectedOptions = [...matchedVariant.options];
+        updateVariantUIButtons();
+      }
+    }
+
+    if (matchedVariant) {
+      document.getElementById('selected-variant-id').value = matchedVariant.id;
+      currentVariantPrice = matchedVariant.price;
+      updateSubtotal();
+      
+      currentColorName = '';
+      document.querySelectorAll('.variant-option-group').forEach(function(group, index) {
+          var label = group.querySelector('.prop-label').innerText.toLowerCase();
+          if (label.includes('color') || label.includes('colour')) {
+              currentColorName = currentSelectedOptions[index];
+          }
+      });
+
+      var dynamicUrl = getImageUrlForVariantAndView(currentColorName, currentArea);
+
+      if (!dynamicUrl && matchedVariant.featured_image && matchedVariant.featured_image.id) {
+        var fId = matchedVariant.featured_image.id;
+        var mediaIndex = productMedia.findIndex(function(m) { return m.id === fId; });
+        if (mediaIndex !== -1) { dynamicUrl = productMedia[mediaIndex].url; }
+      }
+
+      currentBgUrl = dynamicUrl || fallbackImage;
+      if(!isBannerMode) setProductBackground(currentBgUrl); 
+    }
+  }
+
+  function updateVariantUIButtons() {
+    document.querySelectorAll('.variant-btn').forEach(function(btn) {
+      var idx = parseInt(btn.getAttribute('data-option-index'), 10);
+      var val = btn.getAttribute('data-value');
+      if (currentSelectedOptions[idx] === val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  document.querySelectorAll('.variant-btn').forEach(function(btn) {
+    btn.addEventListener('click', handleVariantClick);
+  });
+
+  /* ─── History ────────────────────────────────────────── */
+  function saveHistory() {
+    if (isRestoringState) return;
+    historyData.splice(historyIdx + 1);
+    historyData.push(JSON.stringify(canvas.toJSON(CUSTOM_PROPS)));
+    historyIdx = historyData.length - 1;
+    if (historyData.length > 40) { historyData.shift(); historyIdx--; }
+  }
+
+  function restoreFromHistory(json) {
+    isRestoringState = true;
+    canvas.loadFromJSON(json, function() {
+      
+      // Relink the global name/number objects if they exist in history
+      jerseyNameObj = null;
+      jerseyNumberObj = null;
+      canvas.getObjects().forEach(function(o) {
+          if(o.name === 'jersey_name') jerseyNameObj = o;
+          if(o.name === 'jersey_number') jerseyNumberObj = o;
+      });
+
+      document.getElementById('enable-names').checked = !!jerseyNameObj;
+      document.getElementById('enable-numbers').checked = !!jerseyNumberObj;
+
+      canvas.renderAll();
+      isRestoringState = false;
+      syncPropsToUI();
+      updateLayersPanel();
+    });
+  }
+
+  function undo() { if (historyIdx > 0) { historyIdx--; restoreFromHistory(historyData[historyIdx]); } }
+  function redo() { if (historyIdx < historyData.length - 1) { historyIdx++; restoreFromHistory(historyData[historyIdx]); } }
+  window.undo = undo;
+  window.redo = redo;
+
+  /* ─── View switching (Dynamic) ─────────────────────── */
+  function saveAreaState() {
+    areaStates[currentArea] = { json: JSON.stringify(canvas.toJSON(CUSTOM_PROPS)) };
+  }
+
+  function loadAreaState(area, newBgUrl) {
+    if(isBannerMode) return;
+    currentBgUrl = newBgUrl;
+    var state = areaStates[area];
+    if (state && state.json) {
+      restoreFromHistory(state.json);
+      historyData = [state.json];
+      historyIdx  = 0;
+      setProductBackground(currentBgUrl);
+      updateJerseyVisuals();
+    } else {
+      // Clear specifically objects that are not the global names/numbers
+      var objectsToKeep = [];
+      canvas.getObjects().forEach(function(o) { 
+          if(o.name === 'jersey_name' || o.name === 'jersey_number') objectsToKeep.push(o);
+          else canvas.remove(o); 
+      });
+      canvas.discardActiveObject();
+      setProductBackground(currentBgUrl);
+      updateJerseyVisuals();
+      canvas.renderAll();
+      historyData = [JSON.stringify(canvas.toJSON(CUSTOM_PROPS))];
+      historyIdx  = 0;
+      syncPropsToUI();
+      updateLayersPanel();
+    }
+  }
+
+  function switchView(dir) {
+    if(isBannerMode) return;
+    saveAreaState();
+    currentArea = dir.toLowerCase();
+    
+    var safeId = currentArea.replace(/\s+/g, '-');
+
+    document.querySelectorAll('.view-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    
+    var activeBtn = document.getElementById('btn-view-' + safeId);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+    }
+    
+    var dynamicUrl = getImageUrlForVariantAndView(currentColorName, currentArea);
+    
+    if (!dynamicUrl) {
+       var vId = document.getElementById('selected-variant-id').value;
+       var vMatch = productVariants.find(function(v) { return v.id == vId; });
+       if (vMatch && vMatch.featured_image) {
+           var mIdx = productMedia.findIndex(function(m) { return m.id === vMatch.featured_image.id; });
+           if(mIdx !== -1) dynamicUrl = productMedia[mIdx].url;
+       }
+       if (!dynamicUrl && productMedia.length > 0) { dynamicUrl = productMedia[0].url; }
+    }
+
+    loadAreaState(currentArea, dynamicUrl || fallbackImage);
+  }
+  window.switchView = switchView;
+
+  /* ─── Modals Init ────────────────────────────────────── */
+  function initFontGrid() {
+    var container = document.getElementById('font-grid-container');
+    if (!container) return;
+    container.innerHTML = '';
+    APPAREL_FONTS.forEach(function(font) {
+      var card = document.createElement('div');
+      card.className = 'font-card';
+      card.setAttribute('data-font', font);
+      card.onclick = function() { selectFont(font); };
+      
+      var previewText = (font === 'Creepster') ? 'Boo' : 'Ag';
+      card.innerHTML = 
+        '<div class="font-preview-text" style="font-family: \'' + font + '\', sans-serif;">' + previewText + '</div>' +
+        '<div class="font-name-label">' + font + '</div>';
+      container.appendChild(card);
+    });
+  }
+
+  function initColorGrid() {
+    var container = document.getElementById('color-palette-container');
+    if (!container) return;
+    container.innerHTML = '';
+    PRESET_COLORS.forEach(function(color) {
+      var swatch = document.createElement('div');
+      swatch.className = 'palette-swatch';
+      swatch.style.backgroundColor = color;
+      swatch.setAttribute('data-color', color);
+      swatch.onclick = function() { selectColor(color); };
+      container.appendChild(swatch);
+    });
+  }
+
+  /* Modal Open/Close Logic */
+  function openFontModal() {
+    var currentFont = document.getElementById('master-font').value;
+    document.querySelectorAll('.font-card').forEach(function(card) {
+      if (card.getAttribute('data-font') === currentFont) card.classList.add('active');
+      else card.classList.remove('active');
+    });
+    document.getElementById('font-modal').classList.remove('hidden');
+  }
+  window.openFontModal = openFontModal;
+  function closeFontModal() { document.getElementById('font-modal').classList.add('hidden'); }
+  window.closeFontModal = closeFontModal;
+
+  function switchColorTab(tab) {
+    if(tab === 'solid') {
+        document.getElementById('tab-solid').style.borderColor = 'var(--color-accent)';
+        document.getElementById('tab-solid').style.color = 'var(--color-accent)';
+        document.getElementById('tab-gradient').style.borderColor = 'transparent';
+        document.getElementById('tab-gradient').style.color = 'var(--color-muted)';
+        document.getElementById('section-solid').classList.remove('hidden');
+        document.getElementById('section-gradient').classList.add('hidden');
+    } else {
+        document.getElementById('tab-gradient').style.borderColor = 'var(--color-accent)';
+        document.getElementById('tab-gradient').style.color = 'var(--color-accent)';
+        document.getElementById('tab-solid').style.borderColor = 'transparent';
+        document.getElementById('tab-solid').style.color = 'var(--color-muted)';
+        document.getElementById('section-gradient').classList.remove('hidden');
+        document.getElementById('section-solid').classList.add('hidden');
+    }
+  }
+  window.switchColorTab = switchColorTab;
+
+  function openColorModal(target) {
+    colorTargetType = target; 
+    var title = 'Select Text Color';
+    if(target === 'stroke') title = 'Select Outline Color';
+    if(target === 'shadow') title = 'Select Shadow Color';
+    if(target === 'canvasBg') title = 'Select Canvas Background';
+    document.getElementById('color-modal-title').innerText = title;
+    
+    var currentColor = '#ffffff';
+    if(target === 'fill') currentColor = document.getElementById('master-color').value;
+    if(target === 'stroke') currentColor = document.getElementById('master-stroke-color').value;
+    if(target === 'shadow') currentColor = document.getElementById('prop-shadow-color').value;
+    if(target === 'canvasBg') currentColor = document.getElementById('canvas-bg-color-val').value;
+
+    document.querySelectorAll('.palette-swatch').forEach(function(sw) {
+      if (sw.getAttribute('data-color').toLowerCase() === currentColor.toLowerCase() && currentColor !== 'transparent') sw.classList.add('active');
+      else sw.classList.remove('active');
+    });
+
+    // Reset tab to solid by default when opening
+    switchColorTab('solid');
+
+    document.getElementById('color-modal').classList.remove('hidden');
+  }
+  window.openColorModal = openColorModal;
+  function closeColorModal() { document.getElementById('color-modal').classList.add('hidden'); }
+  window.closeColorModal = closeColorModal;
+
+  function openShapeModal() {
+    var currentShape = document.getElementById('master-shape').value;
+    document.querySelectorAll('.shape-card').forEach(function(card) {
+      if (card.getAttribute('data-shape') === currentShape) card.classList.add('active');
+      else card.classList.remove('active');
+    });
+    document.getElementById('shape-modal').classList.remove('hidden');
+  }
+  window.openShapeModal = openShapeModal;
+  function closeShapeModal() { document.getElementById('shape-modal').classList.add('hidden'); }
+  window.closeShapeModal = closeShapeModal;
+  
+  function removeShape() { selectShape('normal'); }
+  window.removeShape = removeShape;
+
+  function triggerCustomEvent(el, type) {
+    if ('createEvent' in document) {
+      var e = document.createEvent('HTMLEvents');
+      e.initEvent(type, false, true);
+      el.dispatchEvent(e);
+    } else {
+      el.fireEvent('on' + type);
+    }
+  }
+
+  /* ─── Applying Selections ────────────────────────────── */
+  function selectFont(fontName) {
+    document.getElementById('master-font').value = fontName;
+    document.getElementById('label-master-font').innerHTML = fontName + ' <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+    document.getElementById('label-master-font').style.fontFamily = fontName;
+    triggerCustomEvent(document.getElementById('master-font'), 'change');
+    closeFontModal();
+  }
+  window.selectFont = selectFont;
+
+  function selectColor(colorHex) {
+    if (colorTargetType === 'fill') {
+        document.getElementById('master-color').value = colorHex;
+        if(colorHex === 'transparent') {
+            document.getElementById('preview-fill-color').style.background = '';
+            document.getElementById('preview-fill-color').classList.add('checkerboard-pattern');
+        } else {
+            document.getElementById('preview-fill-color').classList.remove('checkerboard-pattern');
+            document.getElementById('preview-fill-color').style.background = colorHex;
+        }
+        triggerCustomEvent(document.getElementById('master-color'), 'change');
+    } else if(colorTargetType === 'stroke') {
+        document.getElementById('master-stroke-color').value = colorHex;
+        if(colorHex === 'transparent') {
+            document.getElementById('preview-stroke-color').style.background = '';
+            document.getElementById('preview-stroke-color').classList.add('checkerboard-pattern');
+            document.getElementById('preview-stroke-color').style.borderStyle = 'dashed';
+        } else {
+            document.getElementById('preview-stroke-color').classList.remove('checkerboard-pattern');
+            document.getElementById('preview-stroke-color').style.background = colorHex;
+            document.getElementById('preview-stroke-color').style.borderStyle = 'solid';
+            var thickSlider = document.getElementById('master-stroke-width');
+            if(parseInt(thickSlider.value) === 0) {
+                thickSlider.value = 4;
+                triggerCustomEvent(thickSlider, 'input');
+                triggerCustomEvent(thickSlider, 'change');
+            }
+        }
+        triggerCustomEvent(document.getElementById('master-stroke-color'), 'change');
+    } else if(colorTargetType === 'shadow') {
+        document.getElementById('prop-shadow-color').value = colorHex;
+        document.getElementById('preview-shadow-color').style.background = colorHex;
+        triggerCustomEvent(document.getElementById('prop-shadow-color'), 'change');
+    } else if(colorTargetType === 'canvasBg') {
+        document.getElementById('canvas-bg-color-val').value = colorHex;
+        document.getElementById('preview-canvas-bg').style.background = colorHex;
+        canvas.backgroundColor = colorHex;
+        canvas.renderAll();
+        saveHistory();
+    }
+    closeColorModal();
+  }
+  window.selectColor = selectColor;
+
+  function applyGradient() {
+      var c1 = document.getElementById('grad-color-1').value;
+      var c2 = document.getElementById('grad-color-2').value;
+      var dir = document.getElementById('grad-dir').value;
+
+      var gradientOpts = {
+          type: 'linear',
+          colorStops: [ { offset: 0, color: c1 }, { offset: 1, color: c2 } ]
+      };
+
+      if (colorTargetType === 'fill') {
+          var obj = getActiveDesignObj();
+          if(obj) {
+              var w = obj.width;
+              var h = obj.height;
+              // Set relative coordinates based on the selected direction
+              var coords = { x1: -w/2, y1: 0, x2: w/2, y2: 0 }; // Horizontal
+              if(dir === 'vertical') coords = { x1: 0, y1: -h/2, x2: 0, y2: h/2 };
+              if(dir === 'diagonal') coords = { x1: -w/2, y1: -h/2, x2: w/2, y2: h/2 };
+              gradientOpts.coords = coords;
+
+              var grad = new fabric.Gradient(gradientOpts);
+              obj.set('fill', grad);
+              canvas.renderAll();
+              saveHistory();
+
+              // Update the visual thumbnail
+              let gradBg = (dir==='vertical') ? 'linear-gradient(to bottom, '+c1+', '+c2+')' : 
+                           (dir==='diagonal') ? 'linear-gradient(135deg, '+c1+', '+c2+')' : 
+                           'linear-gradient(to right, '+c1+', '+c2+')';
+              document.getElementById('preview-fill-color').classList.remove('checkerboard-pattern');
+              document.getElementById('preview-fill-color').style.background = gradBg;
+          } else {
+              showToast("Select a text object first.", "error");
+          }
+      } else if (colorTargetType === 'canvasBg') {
+          var cw = canvas.width;
+          var ch = canvas.height;
+          var coords = { x1: 0, y1: 0, x2: cw, y2: 0 }; // Horizontal
+          if(dir === 'vertical') coords = { x1: 0, y1: 0, x2: 0, y2: ch };
+          if(dir === 'diagonal') coords = { x1: 0, y1: 0, x2: cw, y2: ch };
+          gradientOpts.coords = coords;
+
+          var grad = new fabric.Gradient(gradientOpts);
+          canvas.backgroundColor = grad;
+          canvas.renderAll();
+          saveHistory();
+
+          let gradBg = (dir==='vertical') ? 'linear-gradient(to bottom, '+c1+', '+c2+')' : 
+                       (dir==='diagonal') ? 'linear-gradient(135deg, '+c1+', '+c2+')' : 
+                       'linear-gradient(to right, '+c1+', '+c2+')';
+          document.getElementById('preview-canvas-bg').classList.remove('checkerboard-pattern');
+          document.getElementById('preview-canvas-bg').style.background = gradBg;
+      } else {
+          showToast('Gradients are only supported for Text and Canvas Background.', 'error');
+          return;
+      }
+
+      closeColorModal();
+  }
+  window.applyGradient = applyGradient;
+
+  function selectShape(shapeName) {
+    document.getElementById('master-shape').value = shapeName;
+    var capitalize = shapeName.charAt(0).toUpperCase() + shapeName.slice(1);
+    document.getElementById('label-master-shape').innerHTML = capitalize + ' <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+    
+    document.querySelectorAll('.shape-card').forEach(function(card) {
+      if (card.getAttribute('data-shape') === shapeName) card.classList.add('active');
+      else card.classList.remove('active');
+    });
+
+    var slider = document.getElementById('modal-shape-slider');
+    if(shapeName === 'normal') slider.value = 0;
+    else if(shapeName === 'upward' || shapeName === 'valley' || shapeName === 'downward') slider.value = 150;
+    else slider.value = 120;
+    
+    triggerCustomEvent(document.getElementById('master-shape'), 'change');
+  }
+  window.selectShape = selectShape;
+
+  function updateShapeSlider(val) {
+    document.getElementById('master-radius').value = val;
+    triggerCustomEvent(document.getElementById('master-shape'), 'change'); 
+  }
+  window.updateShapeSlider = updateShapeSlider;
+
+  /* ─── Create/Update Objects based on Main Panel ──────── */
+  function getActiveDesignObj() { return canvas.getActiveObject(); }
+
+  function addTextNew() {
+    var textVal = document.getElementById('master-text-val').value || 'Your Text';
+    if (textVal.trim() === '') textVal = 'Your Text';
+    
+    var ct = new fabric.IText(textVal, {
+      left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2,
+      originX: 'center', originY: 'center',
+      fontFamily: 'Arial', fontSize: 45, fill: '#121212',
+      fontWeight: 'bold', fontStyle: 'normal', textAlign: 'center',
+      angle: 0, stroke: null, strokeWidth: 0, charSpacing: 0, lineHeight: 1.1
+    });
+    
+    canvas.add(ct);
+    canvas.setActiveObject(ct); 
+    canvas.renderAll();
+    saveHistory();
+  }
+  window.addTextNew = addTextNew;
+
+  /* ─── Sync UI Panels ─────────────────────────────────── */
+  function syncPropsToUI() {
+    var obj = getActiveDesignObj();
+    var imgProps = document.getElementById('image-properties-wrapper');
+    var shadowControls = document.getElementById('shadow-controls');
+    
+    if (!obj) {
+      imgProps.classList.add('hidden');
+      return;
+    }
+
+    if(obj.shadow) {
+        document.getElementById('prop-shadow-toggle').checked = true;
+        shadowControls.classList.remove('hidden');
+        document.getElementById('prop-shadow-blur').value = obj.shadow.blur;
+        document.getElementById('prop-shadow-color').value = obj.shadow.color;
+        document.getElementById('preview-shadow-color').style.background = obj.shadow.color;
+    } else {
+        document.getElementById('prop-shadow-toggle').checked = false;
+        shadowControls.classList.add('hidden');
+    }
+
+    if (obj.type === 'image') {
+      imgProps.classList.remove('hidden');
+      document.getElementById('prop-brightness').value  = '0';
+      document.getElementById('prop-grayscale').checked = false;
+      if (obj.filters && obj.filters.length) {
+        obj.filters.forEach(function(f) {
+          if (!f) return;
+          if (f.type === 'Brightness') document.getElementById('prop-brightness').value = f.brightness || 0;
+          if (f.type === 'Grayscale')  document.getElementById('prop-grayscale').checked = true;
+        });
+      }
+    } else {
+      imgProps.classList.add('hidden');
+    }
+
+    if (obj.type === 'i-text' || obj.type === 'apparelText' || obj.type === 'text') {
+        document.getElementById('master-text-val').value = obj.text || '';
+        
+        var fFamily = obj.fontFamily || 'Arial';
+        document.getElementById('master-font').value = fFamily;
+        document.getElementById('label-master-font').innerHTML = fFamily + ' <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+        
+        if(document.getElementById('master-size')) document.getElementById('master-size').value = obj.fontSize || 45;
+        if(document.getElementById('val-master-size')) document.getElementById('val-master-size').innerText = obj.fontSize || 45;
+
+        if(document.getElementById('master-rotation')) document.getElementById('master-rotation').value = Math.round(obj.angle) || 0;
+        if(document.getElementById('val-master-rotation')) document.getElementById('val-master-rotation').innerText = Math.round(obj.angle) + '°';
+
+        if (obj.fill && typeof obj.fill === 'string') {
+            document.getElementById('master-color').value = obj.fill;
+            if(obj.fill === 'transparent') {
+                document.getElementById('preview-fill-color').style.background = '';
+                document.getElementById('preview-fill-color').classList.add('checkerboard-pattern');
+            } else {
+                document.getElementById('preview-fill-color').classList.remove('checkerboard-pattern');
+                document.getElementById('preview-fill-color').style.background = obj.fill;
+            }
+        } else if (obj.fill && obj.fill.colorStops) {
+            // If it is a gradient
+            let c1 = obj.fill.colorStops[0].color;
+            let c2 = obj.fill.colorStops[obj.fill.colorStops.length-1].color;
+            document.getElementById('preview-fill-color').classList.remove('checkerboard-pattern');
+            document.getElementById('preview-fill-color').style.background = 'linear-gradient(to right, '+c1+', '+c2+')';
+        }
+
+        if (obj.stroke && typeof obj.stroke === 'string' && obj.stroke !== 'transparent') {
+            document.getElementById('master-stroke-color').value = obj.stroke;
+            document.getElementById('preview-stroke-color').classList.remove('checkerboard-pattern');
+            document.getElementById('preview-stroke-color').style.background = obj.stroke;
+            document.getElementById('preview-stroke-color').style.borderStyle = 'solid';
+        } else {
+            document.getElementById('master-stroke-color').value = 'transparent';
+            document.getElementById('preview-stroke-color').style.background = '';
+            document.getElementById('preview-stroke-color').classList.add('checkerboard-pattern');
+            document.getElementById('preview-stroke-color').style.borderStyle = 'dashed';
+        }
+
+        document.getElementById('master-stroke-width').value = obj.strokeWidth || 0;
+        document.getElementById('val-master-stroke-width').innerText = obj.strokeWidth || 0;
+
+        if(obj.charSpacing !== undefined) document.getElementById('prop-char-spacing').value = obj.charSpacing;
+        if(obj.lineHeight !== undefined) document.getElementById('prop-line-height').value = obj.lineHeight;
+
+        if(obj.effect) {
+            document.getElementById('master-shape').value = obj.effect;
+            var capitalize = obj.effect.charAt(0).toUpperCase() + obj.effect.slice(1);
+            document.getElementById('label-master-shape').innerHTML = capitalize + ' <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+        } else {
+            document.getElementById('master-shape').value = 'normal';
+            document.getElementById('label-master-shape').innerHTML = 'Normal <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+        }
+        if(obj.intensity !== undefined) {
+            document.getElementById('master-radius').value = obj.intensity;
+            document.getElementById('modal-shape-slider').value = obj.intensity;
+        }
+    }
+  }
+
+  /* ─── Event Listeners for UI Editing ─────────────────── */
+  document.getElementById('prop-char-spacing').addEventListener('input', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'apparelText')) {
+        obj.set('charSpacing', parseInt(this.value, 10));
+        canvas.renderAll();
+    }
+  });
+  document.getElementById('prop-char-spacing').addEventListener('change', saveHistory);
+
+  document.getElementById('prop-line-height').addEventListener('input', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'apparelText')) {
+        obj.set('lineHeight', parseFloat(this.value));
+        canvas.renderAll();
+    }
+  });
+  document.getElementById('prop-line-height').addEventListener('change', saveHistory);
+
+  document.getElementById('prop-shadow-toggle').addEventListener('change', function() {
+      var obj = getActiveDesignObj();
+      if(!obj) return;
+      var wrapper = document.getElementById('shadow-controls');
+      if(this.checked) {
+          wrapper.classList.remove('hidden');
+          var color = document.getElementById('prop-shadow-color').value;
+          var blur = parseInt(document.getElementById('prop-shadow-blur').value, 10);
+          obj.set('shadow', new fabric.Shadow({ color: color, blur: blur, offsetX: 5, offsetY: 5 }));
+      } else {
+          wrapper.classList.add('hidden');
+          obj.set('shadow', null);
+      }
+      canvas.renderAll();
+      saveHistory();
+  });
+  document.getElementById('prop-shadow-blur').addEventListener('input', function() {
+      var obj = getActiveDesignObj();
+      if(obj && obj.shadow) {
+          obj.shadow.blur = parseInt(this.value, 10);
+          canvas.renderAll();
+      }
+  });
+  document.getElementById('prop-shadow-blur').addEventListener('change', saveHistory);
+  document.getElementById('prop-shadow-color').addEventListener('change', function() {
+      var obj = getActiveDesignObj();
+      if(obj && obj.shadow) {
+          obj.shadow.color = this.value;
+          canvas.renderAll();
+          saveHistory();
+      }
+  });
+
+  document.getElementById('master-text-val').addEventListener('input', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'apparelText' || obj.type === 'i-text')) {
+      obj.set('text', this.value || ' ');
+      if(obj.type === 'apparelText') obj._calcBounds();
+      canvas.renderAll();
+    }
+  });
+  document.getElementById('master-text-val').addEventListener('change', saveHistory);
+
+  document.getElementById('master-font').addEventListener('change', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'apparelText' || obj.type === 'i-text')) {
+      obj.set('fontFamily', this.value);
+      if(obj.type === 'apparelText') obj._calcBounds();
+      canvas.renderAll();
+      saveHistory();
+    }
+  });
+
+  document.getElementById('master-color').addEventListener('change', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'apparelText' || obj.type === 'i-text' || obj.type === 'rect' || obj.type === 'circle' || obj.type === 'triangle')) {
+      obj.set('fill', this.value);
+      canvas.renderAll();
+      saveHistory();
+    }
+  });
+
+  document.getElementById('master-stroke-color').addEventListener('change', function() {
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'apparelText' || obj.type === 'i-text' || obj.type === 'rect' || obj.type === 'circle' || obj.type === 'triangle')) {
+      var val = this.value;
+      var thickness = parseInt(document.getElementById('master-stroke-width').value, 10) || 3;
+      if(val === 'transparent') {
+          obj.set({ stroke: null, strokeWidth: 0 });
+      } else {
+          obj.set({ stroke: val, strokeWidth: thickness });
+      }
+      if(obj.type === 'apparelText') obj._calcBounds();
+      canvas.renderAll();
+      saveHistory();
+    }
+  });
+
+  document.getElementById('master-stroke-width').addEventListener('input', function() {
+    document.getElementById('val-master-stroke-width').innerText = this.value;
+    var obj = getActiveDesignObj();
+    if (obj && (obj.type === 'apparelText' || obj.type === 'i-text' || obj.type === 'rect' || obj.type === 'circle' || obj.type === 'triangle')) {
+        if(obj.stroke && obj.stroke !== 'transparent') {
+            obj.set('strokeWidth', parseInt(this.value, 10));
+            if(obj.type === 'apparelText') obj._calcBounds();
+            canvas.renderAll();
+        }
+    }
+  });
+  document.getElementById('master-stroke-width').addEventListener('change', saveHistory);
+
+  document.getElementById('master-shape').addEventListener('change', function() {
+    var obj = getActiveDesignObj();
+    var shapeVal = this.value;
+    var intensity = parseInt(document.getElementById('master-radius').value, 10);
+    
+    if (obj && obj.type === 'i-text') {
+        var newObj = new fabric.ApparelText(obj.text, {
+            left: obj.left, top: obj.top, originX: obj.originX, originY: obj.originY,
+            fontFamily: obj.fontFamily, fontSize: obj.fontSize, fill: obj.fill,
+            stroke: obj.stroke, strokeWidth: obj.strokeWidth, angle: obj.angle,
+            effect: shapeVal, intensity: intensity
+        });
+        canvas.remove(obj);
+        canvas.add(newObj);
+        canvas.setActiveObject(newObj);
+        canvas.renderAll();
+        saveHistory();
+    } else if (obj && obj.type === 'apparelText') {
+        obj.set({ effect: shapeVal, intensity: intensity });
+        obj._calcBounds();
+        canvas.renderAll();
+        saveHistory();
+    }
+  });
+
+  /* ─── Image Upload & Graphics ────────────────────────── */
+  function handleImageUpload(file) {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Max 5MB allowed.', 'error'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      fabric.Image.fromURL(e.target.result, function(img) {
+        if (!img) return;
+        var scale = Math.min((window.baseVisualWidth * 0.7) / img.width, (window.baseVisualHeight * 0.7) / img.height, 1);
+        img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale });
+        img.filters = [];
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+        saveHistory();
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+  window.handleImageUpload = handleImageUpload;
+
+  function addArtwork(url) {
+    if (url.startsWith('//')) url = 'https:' + url;
+    fabric.Image.fromURL(url, function(img) {
+      if (!img) return;
+      var scale = Math.min((window.baseVisualWidth * 0.7) / img.width, (window.baseVisualHeight * 0.7) / img.height, 1);
+      img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale });
+      img.filters = [];
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+      saveHistory(); 
+      showToast('Artwork added successfully!');
+    }, { crossOrigin: 'anonymous' }); 
+  }
+  window.addArtwork = addArtwork;
+
+  /* Image filters & Flips */
+  function applyImageFilter() {
+    var obj = getActiveDesignObj();
+    if (!obj || obj.type !== 'image') return;
+    obj.filters = [];
+    var brightness = parseFloat(document.getElementById('prop-brightness').value);
+    var grayscale  = document.getElementById('prop-grayscale').checked;
+    if (brightness !== 0) obj.filters.push(new fabric.Image.filters.Brightness({ brightness: brightness }));
+    if (grayscale) obj.filters.push(new fabric.Image.filters.Grayscale());
+    obj.applyFilters();
+    obj.dirty = true;
+    canvas.renderAll();
+  }
+  document.getElementById('prop-brightness').addEventListener('input',  applyImageFilter);
+  document.getElementById('prop-brightness').addEventListener('change', saveHistory);
+  document.getElementById('prop-grayscale').addEventListener('change', function() { applyImageFilter(); saveHistory(); });
+
+  function flipImage(axis) {
+      var obj = getActiveDesignObj();
+      if(!obj || obj.type !== 'image') return;
+      if(axis === 'x') obj.set('flipX', !obj.flipX);
+      if(axis === 'y') obj.set('flipY', !obj.flipY);
+      canvas.renderAll();
+      saveHistory();
+  }
+  window.flipImage = flipImage;
+
+  canvas.on('object:modified', saveHistory);
+
+  /* ─── Delete / clear / accordian ─────────────────────── */
+  function deleteSelected() {
+    var obj = canvas.getActiveObject();
+    if (!obj) return;
+    if (obj.type === 'activeSelection') obj.forEachObject(function(o) { canvas.remove(o); });
+    else canvas.remove(obj);
+    canvas.discardActiveObject();
+    canvas.renderAll();
+    saveHistory();
+  }
+  window.deleteSelected = deleteSelected;
+
+  function clearCanvas() {
+    var objs = canvas.getObjects();
+    if (!objs.length) return;
+    objs.forEach(function(o) { canvas.remove(o); });
+    canvas.discardActiveObject();
+    
+    // reset global name/number state
+    jerseyNameObj = null;
+    jerseyNumberObj = null;
+    document.getElementById('enable-names').checked = false;
+    document.getElementById('enable-numbers').checked = false;
+
+    canvas.renderAll();
+    saveHistory();
+  }
+  window.clearCanvas = clearCanvas;
+
+  function toggleAccordion(element) {
+    document.querySelectorAll('.tool-card').forEach(function(card) {
+      if (card !== element) card.classList.remove('active');
+    });
+    element.classList.toggle('active');
+  }
+  window.toggleAccordion = toggleAccordion;
+
+  /* ─── DYNAMIC Preview Modal Logic ───────────────────────── */
+  function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
+  window.closePreviewModal = closePreviewModal;
+
+  function generateOffscreenImageAsync(json, bgUrl) {
+    return new Promise(function(resolve) {
+      generateOffscreenImages(json, bgUrl, function(dataUrls) { resolve(dataUrls); });
+    });
+  }
+
+  function showPreview() {
+    saveAreaState();
+    document.getElementById('preview-modal').classList.remove('hidden');
+    var modalBody = document.getElementById('dynamic-preview-body');
+    modalBody.innerHTML = '<p style="text-align:center; width:100%; color:var(--color-muted);">Generating preview...</p>';
+
+    if(isBannerMode) {
+        var dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1.5 });
+        modalBody.innerHTML = '<div class="modal-view-col" style="width:100%"><img src="' + dataUrl + '" style="width:100%; max-width:800px; display:block; margin:auto;"></div>';
+        return;
+    }
+
+    var previewPromises = availableViews.map(function(view) {
+        var state = areaStates[view] ? areaStates[view].json : null;
+        var viewBgUrl = getImageUrlForVariantAndView(currentColorName, view) || fallbackImage;
+        return generateOffscreenImageAsync(state, viewBgUrl).then(function(dataUrls) {
+           return { view: view, dataUrls: dataUrls };
+        });
+    });
+
+    Promise.all(previewPromises).then(function(results) {
+        modalBody.innerHTML = '';
+        results.forEach(function(res) {
+            var col = document.createElement('div');
+            col.className = 'modal-view-col';
+            col.innerHTML = '<p class="modal-view-label">' + res.view + ' View</p>' +
+                            '<div class="modal-img-box">' +
+                            '<img src="' + res.dataUrls.withBg + '" alt="' + res.view + ' preview">' +
+                            '</div>';
+            modalBody.appendChild(col);
+        });
+    });
+  }
+  window.showPreview = showPreview;
+
+  /* ─── OFF-SCREEN RENDERER FOR CART ───────────────────── */
+  function generateOffscreenImages(json, bgUrl, callback) {
+    var tempCanvas = new fabric.StaticCanvas(null, { width: window.baseVisualWidth, height: window.baseVisualHeight });
+    var doRender = function() {
+      tempCanvas.backgroundImage = null;
+      tempCanvas.backgroundColor = null;
+      tempCanvas.renderAll();
+      var transparentDataUrl = tempCanvas.toDataURL({ format: 'png', multiplier: 1.5 });
+
+      if (bgUrl && bgUrl.indexOf('no-image') === -1) {
+        var finalUrl = bgUrl;
+        if(bgUrl.indexOf('//') === 0) finalUrl = 'https:' + bgUrl;
+        
+        fabric.Image.fromURL(finalUrl, function(img) {
+          if (img) {
+            var scaleFactor = Math.min(window.baseVisualWidth / img.width, window.baseVisualHeight / img.height);
+            tempCanvas.setBackgroundImage(img, function() {
+              tempCanvas.renderAll();
+              var bgDataUrl = tempCanvas.toDataURL({ format: 'png', multiplier: 1.5 });
+              callback({ transparent: transparentDataUrl, withBg: bgDataUrl });
+            }, { originX: 'center', originY: 'center', left: window.baseVisualWidth/2, top: window.baseVisualHeight/2, crossOrigin: 'anonymous' });
+          } else { callback({ transparent: transparentDataUrl, withBg: transparentDataUrl }); }
+        }, { crossOrigin: 'anonymous' });
+      } else { callback({ transparent: transparentDataUrl, withBg: transparentDataUrl }); }
+    };
+
+    if (json) { tempCanvas.loadFromJSON(json, function() { doRender(); }); } 
+    else { doRender(); }
+  }
+
+  /* ─── EXPORT BUTTONS ────────────────────────────────────── */
+  function exportDesign(format) {
+      canvas.setZoom(1);
+      canvas.setWidth(window.baseVisualWidth);
+      canvas.setHeight(window.baseVisualHeight);
+
+      var dataUrl = canvas.toDataURL({ format: format === 'jpg' ? 'jpeg' : 'png', quality: 1, multiplier: 3 });
+      var link = document.createElement('a');
+      link.download = 'MyDesign.' + format;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      applyZoomAndSize();
+  }
+  window.exportDesign = exportDesign;
+
+  /* ─── DYNAMIC Cart submit ────────────────────────────────────── */
+  function dataURLtoFile(dataurl, filename) {
+    var arr   = dataurl.split(',');
+    var mimeMatch = arr[0].match(/:(.*?);/);
+    var mime  = mimeMatch ? mimeMatch[1] : 'image/png';
+    var bstr  = atob(arr[arr.length - 1]);
+    var n     = bstr.length;
+    var u8arr = new Uint8Array(n);
+    while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+    return new File([u8arr], filename, { type: mime });
+  }
+
+  function handleCartSubmit(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (window.isSubmitting) return;
+    
+    var btn = document.getElementById('add-to-cart-submit-bottom');
+    if(btn) { btn.innerHTML = 'Processing...'; btn.disabled  = true; }
+    window.isSubmitting = true;
+
+    saveAreaState();
+
+    if(isBannerMode) {
+        showToast('To add to cart, please switch back to Apparel mode.', 'error');
+        if(btn) { btn.innerHTML = 'Add to Cart <i class="fa-solid fa-cart-shopping"></i>'; btn.disabled  = false; }
+        window.isSubmitting = false;
+        return;
+    }
+
+    var validRosterCount = roster.filter(p => p.name || p.number).length;
+
+    var renderPromises = availableViews.map(function(view) {
+        var state = areaStates[view] ? areaStates[view].json : null;
+        var viewBgUrl = getImageUrlForVariantAndView(currentColorName, view) || fallbackImage;
+
+        return generateOffscreenImageAsync(state, viewBgUrl).then(function(dataUrls) {
+            var capView = view.charAt(0).toUpperCase() + view.slice(1);
+            return { 
+                view: capView, 
+                fileBg: dataURLtoFile(dataUrls.withBg, capView + '-Preview.png'),
+                fileTransparent: dataURLtoFile(dataUrls.transparent, capView + '-Design.png')
+            };
+        });
+    });
+
+    Promise.all(renderPromises).then(function(renderedViews) {
+        var qtyInput = document.getElementById('quantity').value;
+        var qty           = isNaN(parseInt(qtyInput, 10)) ? 1 : parseInt(qtyInput, 10);
+        var bundleId      = 'bundle-' + Date.now();
+        var mainVariantId = document.getElementById('selected-variant-id').value;
+
+        var selectedAddons = [];
+        document.querySelectorAll('.addon-checkbox:checked').forEach(function(cb) {
+          selectedAddons.push({
+            vid:   cb.getAttribute('data-vid'),
+            label: cb.getAttribute('data-label'),
+            price: parseInt(cb.getAttribute('data-price') || '0', 10)
+          });
+        });
+
+        var mainFormData = new FormData();
+        mainFormData.append('id', mainVariantId);
+        mainFormData.append('quantity', qty);
+        mainFormData.append('properties[_bundle_id]',      bundleId);
+        
+        // Append Roster Data if any
+        if(validRosterCount > 0) {
+            mainFormData.append('properties[Team Roster]', JSON.stringify(roster.filter(p => p.name || p.number)));
+            mainFormData.append('properties[Names Addon]', document.getElementById('enable-names').checked ? 'Yes' : 'No');
+            mainFormData.append('properties[Numbers Addon]', document.getElementById('enable-numbers').checked ? 'Yes' : 'No');
+        }
+        
+        renderedViews.forEach(function(res) {
+            mainFormData.append('properties[' + res.view + ' Preview]', res.fileBg);
+            mainFormData.append('properties[' + res.view + ' Design (Transparent)]', res.fileTransparent);
+        });
+        
+        selectedAddons.forEach(function(addon) {
+          mainFormData.append('properties[' + addon.label + ']', formatMoney(addon.price));
+        });
+
+        document.querySelectorAll('.custom-metafield-input').forEach(function(input) {
+          if (input.value.trim() !== '') {
+            mainFormData.append('properties[' + input.getAttribute('data-label') + ']', input.value.trim());
+          }
+        });
+
+        var cartDrawerEl = document.querySelector('cart-drawer');
+        var rootPath = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) ? window.Shopify.routes.root : '/';
+
+        if (selectedAddons.length === 0) {
+          mainFormData.append('sections', cartDrawerEl ? 'cart-drawer,cart-icon-bubble' : 'cart-icon-bubble');
+          mainFormData.append('sections_url', window.location.pathname);
+        }
+
+        fetch(rootPath + 'cart/add.js', {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+          body: mainFormData
+        })
+        .then(function(response) {
+          if (!response.ok) return response.text().then(function(text) { throw new Error('Failed to add main item: ' + text); });
+          return response.json();
+        })
+        .then(function(mainData) {
+          if (selectedAddons.length > 0) {
+            var addonsPayload = {
+              items: selectedAddons.map(function(addon) {
+                return {
+                  id: addon.vid, quantity: qty,
+                  properties: { _bundle_id: bundleId, _hidden_addon: 'true', _parent_variant: mainVariantId }
+                };
+              })
+            };
+
+            if (cartDrawerEl) {
+              addonsPayload.sections = 'cart-drawer,cart-icon-bubble';
+              addonsPayload.sections_url = window.location.pathname;
+            }
+
+            return fetch(rootPath + 'cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+              body: JSON.stringify(addonsPayload)
+            })
+            .then(function(res) {
+              if (!res.ok) throw new Error('Failed to add customizations');
+              return res.json();
+            });
+          } else { return mainData; }
+        })
+        .then(function(finalData) {
+          if (cartDrawerEl) {
+            if (typeof cartDrawerEl.renderContents === 'function') cartDrawerEl.renderContents(finalData);
+            if (typeof cartDrawerEl.open === 'function') cartDrawerEl.open();
+            cartDrawerEl.classList.remove('is-empty');
+          } else { window.location.href = rootPath + 'cart'; }
+          showToast('Added to cart successfully!');
+        })
+        .catch(function(error) {
+          console.error('Cart error:', error);
+          showToast('Something went wrong adding to cart.', 'error');
+        })
+        .finally(function() {
+          if(btn) { btn.innerHTML = 'Add to Cart <i class="fa-solid fa-cart-shopping"></i>'; btn.disabled  = false; }
+          window.isSubmitting = false;
+        });
+    });
+  }
+  window.handleCartSubmit = handleCartSubmit;
+
+  /* ─── Init ───────────────────────────────────────────── */
+  historyData.push(JSON.stringify(canvas.toJSON(CUSTOM_PROPS)));
+  historyIdx = 0;
+
+  initFontGrid();
+  initColorGrid();
+  initVariantState();
+  findAndUpdateVariant();
+  updateSubtotal(); // Initial subtotal update
+
+  // Ensuring all sidebar panels are closed by default, EXCEPT text tool
+  document.querySelectorAll('.tool-card').forEach(function(card, idx) {
+      if(idx === 0) card.classList.add('active');
+      else card.classList.remove('active');
+  });
+
+})();
+</script>
