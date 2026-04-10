@@ -28,8 +28,8 @@
 }
 {% endschema %}
 
-<!-- Added dedicated athletic fonts: Bungee, Bungee Inline, Bungee Shade, Graduate, Black Ops One, Tourney -->
-<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Bangers&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Inline&family=Bungee+Shade&family=Caveat&family=Cinzel&family=Courgette&family=Creepster&family=Dancing+Script&family=Fredoka+One&family=Graduate&family=Inter:wght@400;600;700&family=Lato:wght@400;700&family=Lobster&family=Montserrat:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Quicksand:wght@500;700&family=Raleway:wght@400;700&family=Righteous&family=Roboto:wght@400;700&family=Rubik:wght@400;600&family=Russo+One&family=Special+Elite&family=Tourney:wght@900&display=swap" rel="stylesheet">
+<!-- Added dedicated athletic fonts and new block styles for numbers -->
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Bangers&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Inline&family=Bungee+Shade&family=Caveat&family=Cinzel&family=Courgette&family=Creepster&family=Dancing+Script&family=Fredoka+One&family=Graduate&family=Inter:wght@400;600;700;900&family=Lato:wght@400;700&family=Lobster&family=Montserrat:wght@400;700;900&family=Nunito:wght@400;700;900&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Quicksand:wght@500;700&family=Raleway:wght@400;700&family=Righteous&family=Roboto:wght@400;700&family=Rubik:wght@400;600&family=Russo+One&family=Special+Elite&family=Tourney:wght@900&family=Stardos+Stencil:wght@700&family=Teko:wght@600;700&family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet">
 
 {% style %}
   {{ section.settings.heading_font | font_face: font_display: 'swap' }}
@@ -434,7 +434,7 @@
             <!-- ADDED: DEDICATED FONT STYLES FOR NAMES AND NUMBERS -->
             <div class="prop-group">
               <label class="prop-label">Font Styles</label>
-              <div class="side-height-row">
+              <div class="side-height-row" style="display:flex; flex-direction:column; gap:10px;">
                 <div>
                   <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NAME FONT</span>
                   <select id="name-font-style" class="custom-input-modern" onchange="updateJerseyVisuals()">
@@ -447,17 +447,11 @@
                 </div>
                 <div>
                   <span style="font-size:10px; color:var(--color-muted); display:block; margin-bottom:4px;">NUMBER FONT</span>
-                  <select id="number-font-style" class="custom-input-modern" onchange="updateJerseyVisuals()">
-                    <option value="Arial">Basic (Arial)</option>
-                    <option value="Anton">Block (Anton)</option>
-                    <option value="Bebas Neue">Tall Block (Bebas)</option>
-                    <option value="Bungee">Thick Rounded</option>
-                    <option value="Bungee Inline">Inline (Cutout)</option>
-                    <option value="Bungee Shade">3D Shadow</option>
-                    <option value="Graduate">College/Varsity</option>
-                    <option value="Black Ops One">Stencil</option>
-                    <option value="Tourney">Outline</option>
-                  </select>
+                  <!-- Using a button to trigger the visual prominent number font modal -->
+                  <button type="button" class="pro-editor-btn" onclick="openNumberFontModal()" style="padding: 8px 12px; margin-bottom: 0;">
+                    <span class="value" id="label-number-font" style="font-family: 'Graduate'; width:100%; justify-content:space-between;">Graduate <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i></span>
+                  </button>
+                  <input type="hidden" id="number-font-val" value="Graduate" onchange="updateJerseyVisuals()">
                 </div>
               </div>
             </div>
@@ -550,6 +544,20 @@
                 </div>
             </div>
 
+            <!-- 3D Transform Settings (Added for 3D View/Tilt) -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border);">
+                <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--color-txt);">3D View / Tilt</p>
+                <div class="slider-container">
+                  <label>Tilt X (Left/Right)</label>
+                  <input type="range" id="prop-skew-x" min="-60" max="60" value="0">
+                </div>
+                <div class="slider-container" style="margin-bottom: 10px;">
+                  <label>Tilt Y (Up/Down)</label>
+                  <input type="range" id="prop-skew-y" min="-60" max="60" value="0">
+                </div>
+                <button class="btn-outline-primary" onclick="reset3DTilt()" style="width:100%; padding: 8px;">Reset 3D View</button>
+            </div>
+
             <!-- Advanced Typography -->
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border);">
                 <p style="font-size: 13px; font-weight: bold; margin-bottom: 10px; color: var(--color-txt);">Spacing & Alignment</p>
@@ -600,6 +608,18 @@
                   <button class="btn-add-element" onclick="flipImage('x')"><i class="fa-solid fa-clock-rotate-left"></i> Horizontal</button>
                   <button class="btn-add-element" onclick="flipImage('y')"><i class="fa-solid fa-clock-rotate-left fa-rotate-90"></i> Vertical</button>
               </div>
+
+              <!-- Image 3D Transform (Same as text for flexibility) -->
+              <p style="font-size: 13px; font-weight: bold; margin-top: 15px; border-top: 1px solid var(--color-border); padding-top: 15px; margin-bottom: 10px;">3D View / Tilt</p>
+              <div class="slider-container">
+                <label>Tilt X</label>
+                <input type="range" id="img-skew-x" min="-60" max="60" value="0">
+              </div>
+              <div class="slider-container" style="margin-bottom: 10px;">
+                <label>Tilt Y</label>
+                <input type="range" id="img-skew-y" min="-60" max="60" value="0">
+              </div>
+              <button class="btn-outline-primary" onclick="reset3DTilt()" style="width:100%; padding: 8px;">Reset 3D View</button>
             </div>
           </div>
         </div>
@@ -912,6 +932,17 @@
   </div>
 </div>
 
+<!-- NUMBER FONTS MODAL -->
+<div id="number-font-modal" class="modal-overlay hidden" onclick="closeNumberFontModal()">
+  <div class="modal-content" style="max-width: 800px;" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeNumberFontModal()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="modal-title">Choose Number Font</h2>
+    <div class="font-grid" id="number-font-grid-container">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</div>
+
 <!-- COLOR PALETTE MODAL (Updated for Solid & Gradient) -->
 <div id="color-modal" class="modal-overlay hidden" onclick="closeColorModal()">
   <div class="modal-content" style="max-width: 500px;" onclick="event.stopPropagation()">
@@ -1170,8 +1201,8 @@
 
   var isBannerMode = false;
   
-  // Base properties to save
-  var CUSTOM_PROPS = ['id', 'text', 'effect', 'intensity', 'spacing', 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'textAlign', 'fill', 'opacity', 'angle', 'filters', 'stroke', 'strokeWidth', 'shadow', 'lineHeight', 'charSpacing', 'name'];
+  // Base properties to save (Added skewX & skewY for 3D Tilt)
+  var CUSTOM_PROPS = ['id', 'text', 'effect', 'intensity', 'spacing', 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'textAlign', 'fill', 'opacity', 'angle', 'filters', 'stroke', 'strokeWidth', 'shadow', 'lineHeight', 'charSpacing', 'name', 'skewX', 'skewY'];
 
   var fallbackImage = "{{ section.settings.fallback_image | image_url: width: 600 }}";
   if (!fallbackImage || fallbackImage.indexOf('no-image') !== -1) fallbackImage = '';
@@ -1209,6 +1240,14 @@
     'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Inter',
     'Raleway', 'Ubuntu', 'Nunito', 'Quicksand', 'Rubik'
   ];
+
+  // Specific athletic/block fonts for jersey numbers
+  var NUMBER_FONTS = [
+    'Graduate', 'Tourney', 'Bebas Neue', 'Anton', 'Impact', 'Arial Black', 
+    'Cinzel', 'Black Ops One', 'Bungee', 'Montserrat', 'Stardos Stencil', 
+    'Teko', 'M PLUS Rounded 1c'
+  ];
+
   var currentFontTarget = 'master';
 
   var PRESET_COLORS = [
@@ -1928,7 +1967,7 @@
       var enableNum = document.getElementById('enable-numbers').checked;
       if (enableNum) {
         if (!jerseyNumberObj) {
-            var numFont = document.getElementById('number-font-style') ? document.getElementById('number-font-style').value : 'Arial';
+            var numFont = document.getElementById('number-font-val') ? document.getElementById('number-font-val').value : 'Graduate';
             jerseyNumberObj = new fabric.ApparelText('00', {
               left: window.baseVisualWidth / 2, 
               top: window.baseVisualHeight * 0.45, 
@@ -1959,7 +1998,7 @@
     var numH = parseFloat(document.getElementById('number-height').value) || 8;
     
     var nameFont = document.getElementById('name-font-style') ? document.getElementById('name-font-style').value : 'Arial';
-    var numFont = document.getElementById('number-font-style') ? document.getElementById('number-font-style').value : 'Arial';
+    var numFont = document.getElementById('number-font-val') ? document.getElementById('number-font-val').value : 'Graduate';
 
     if (jerseyNameObj) {
       jerseyNameObj.visible = (nSide === currentArea);
@@ -2324,6 +2363,23 @@
     });
   }
 
+  function initNumberFontGrid() {
+    var container = document.getElementById('number-font-grid-container');
+    if (!container) return;
+    container.innerHTML = '';
+    NUMBER_FONTS.forEach(function(font) {
+      var card = document.createElement('div');
+      card.className = 'font-card number-font-card';
+      card.setAttribute('data-font', font);
+      card.onclick = function() { selectNumberFont(font); };
+      
+      card.innerHTML = 
+        '<div class="font-preview-text" style="font-family: \'' + font + '\', sans-serif; font-size: 32px;">00</div>' +
+        '<div class="font-name-label">' + font + '</div>';
+      container.appendChild(card);
+    });
+  }
+
   function initColorGrid() {
     var container = document.getElementById('color-palette-container');
     if (!container) return;
@@ -2341,7 +2397,7 @@
   /* Modal Open/Close Logic */
   function openFontModal() {
     var currentFont = document.getElementById('master-font').value;
-    document.querySelectorAll('.font-card').forEach(function(card) {
+    document.querySelectorAll('.font-card:not(.number-font-card)').forEach(function(card) {
       if (card.getAttribute('data-font') === currentFont) card.classList.add('active');
       else card.classList.remove('active');
     });
@@ -2350,6 +2406,21 @@
   window.openFontModal = openFontModal;
   function closeFontModal() { document.getElementById('font-modal').classList.add('hidden'); }
   window.closeFontModal = closeFontModal;
+
+  function openNumberFontModal() {
+    var currentFont = document.getElementById('number-font-val').value;
+    document.querySelectorAll('.number-font-card').forEach(function(card) {
+        if (card.getAttribute('data-font') === currentFont) card.classList.add('active');
+        else card.classList.remove('active');
+    });
+    document.getElementById('number-font-modal').classList.remove('hidden');
+  }
+  window.openNumberFontModal = openNumberFontModal;
+
+  function closeNumberFontModal() { 
+      document.getElementById('number-font-modal').classList.add('hidden'); 
+  }
+  window.closeNumberFontModal = closeNumberFontModal;
 
   function switchColorTab(tab) {
     if(tab === 'solid') {
@@ -2432,6 +2503,15 @@
     closeFontModal();
   }
   window.selectFont = selectFont;
+
+  function selectNumberFont(fontName) {
+    document.getElementById('number-font-val').value = fontName;
+    document.getElementById('label-number-font').innerHTML = fontName + ' <i class="fa-solid fa-chevron-right" style="font-size:10px; color:#ccc;"></i>';
+    document.getElementById('label-number-font').style.fontFamily = fontName;
+    updateJerseyVisuals();
+    closeNumberFontModal();
+  }
+  window.selectNumberFont = selectNumberFont;
 
   function selectColor(colorHex) {
     if (colorTargetType === 'fill') {
@@ -2564,6 +2644,28 @@
   }
   window.updateShapeSlider = updateShapeSlider;
 
+  /* ─── 3D Tilt / Skew Helper Functions (NEW) ──────────── */
+  function updateSkew(val, axis) {
+    var obj = getActiveDesignObj();
+    if(obj) {
+      obj.set(axis, parseFloat(val));
+      canvas.renderAll();
+    }
+  }
+  
+  window.reset3DTilt = function() {
+    var obj = getActiveDesignObj();
+    if (obj) {
+      obj.set({skewX: 0, skewY: 0});
+      if(document.getElementById('prop-skew-x')) document.getElementById('prop-skew-x').value = 0;
+      if(document.getElementById('prop-skew-y')) document.getElementById('prop-skew-y').value = 0;
+      if(document.getElementById('img-skew-x')) document.getElementById('img-skew-x').value = 0;
+      if(document.getElementById('img-skew-y')) document.getElementById('img-skew-y').value = 0;
+      canvas.renderAll();
+      saveHistory();
+    }
+  };
+
   /* ─── Create/Update Objects based on Main Panel ──────── */
   function getActiveDesignObj() { return canvas.getActiveObject(); }
 
@@ -2576,7 +2678,8 @@
       originX: 'center', originY: 'center',
       fontFamily: 'Arial', fontSize: 45, fill: '#121212',
       fontWeight: 'bold', fontStyle: 'normal', textAlign: 'center',
-      angle: 0, stroke: null, strokeWidth: 0, charSpacing: 0, lineHeight: 1.1
+      angle: 0, stroke: null, strokeWidth: 0, charSpacing: 0, lineHeight: 1.1,
+      skewX: 0, skewY: 0
     });
     
     canvas.add(ct);
@@ -2596,6 +2699,14 @@
       imgProps.classList.add('hidden');
       return;
     }
+
+    // Sync 3D Tilt sliders
+    var sX = obj.skewX || 0;
+    var sY = obj.skewY || 0;
+    if(document.getElementById('prop-skew-x')) document.getElementById('prop-skew-x').value = sX;
+    if(document.getElementById('prop-skew-y')) document.getElementById('prop-skew-y').value = sY;
+    if(document.getElementById('img-skew-x')) document.getElementById('img-skew-x').value = sX;
+    if(document.getElementById('img-skew-y')) document.getElementById('img-skew-y').value = sY;
 
     if(obj.shadow) {
         document.getElementById('prop-shadow-toggle').checked = true;
@@ -2687,6 +2798,24 @@
   }
 
   /* ─── Event Listeners for UI Editing ─────────────────── */
+  // 3D Tilt Event Listeners
+  if(document.getElementById('prop-skew-x')) {
+    document.getElementById('prop-skew-x').addEventListener('input', function() { updateSkew(this.value, 'skewX'); if(document.getElementById('img-skew-x')) document.getElementById('img-skew-x').value = this.value; });
+    document.getElementById('prop-skew-x').addEventListener('change', saveHistory);
+  }
+  if(document.getElementById('prop-skew-y')) {
+    document.getElementById('prop-skew-y').addEventListener('input', function() { updateSkew(this.value, 'skewY'); if(document.getElementById('img-skew-y')) document.getElementById('img-skew-y').value = this.value; });
+    document.getElementById('prop-skew-y').addEventListener('change', saveHistory);
+  }
+  if(document.getElementById('img-skew-x')) {
+    document.getElementById('img-skew-x').addEventListener('input', function() { updateSkew(this.value, 'skewX'); if(document.getElementById('prop-skew-x')) document.getElementById('prop-skew-x').value = this.value; });
+    document.getElementById('img-skew-x').addEventListener('change', saveHistory);
+  }
+  if(document.getElementById('img-skew-y')) {
+    document.getElementById('img-skew-y').addEventListener('input', function() { updateSkew(this.value, 'skewY'); if(document.getElementById('prop-skew-y')) document.getElementById('prop-skew-y').value = this.value; });
+    document.getElementById('img-skew-y').addEventListener('change', saveHistory);
+  }
+
   document.getElementById('prop-char-spacing').addEventListener('input', function() {
     var obj = getActiveDesignObj();
     if (obj && (obj.type === 'i-text' || obj.type === 'text' || obj.type === 'apparelText')) {
@@ -2806,7 +2935,7 @@
             left: obj.left, top: obj.top, originX: obj.originX, originY: obj.originY,
             fontFamily: obj.fontFamily, fontSize: obj.fontSize, fill: obj.fill,
             stroke: obj.stroke, strokeWidth: obj.strokeWidth, angle: obj.angle,
-            effect: shapeVal, intensity: intensity
+            effect: shapeVal, intensity: intensity, skewX: obj.skewX, skewY: obj.skewY
         });
         canvas.remove(obj);
         canvas.add(newObj);
@@ -2830,7 +2959,7 @@
       fabric.Image.fromURL(e.target.result, function(img) {
         if (!img) return;
         var scale = Math.min((window.baseVisualWidth * 0.7) / img.width, (window.baseVisualHeight * 0.7) / img.height, 1);
-        img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale });
+        img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale, skewX: 0, skewY: 0 });
         img.filters = [];
         canvas.add(img);
         canvas.setActiveObject(img);
@@ -2847,7 +2976,7 @@
     fabric.Image.fromURL(url, function(img) {
       if (!img) return;
       var scale = Math.min((window.baseVisualWidth * 0.7) / img.width, (window.baseVisualHeight * 0.7) / img.height, 1);
-      img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale });
+      img.set({ left: window.baseVisualWidth / 2, top: window.baseVisualHeight / 2, originX: 'center', originY: 'center', scaleX: scale, scaleY: scale, skewX: 0, skewY: 0 });
       img.filters = [];
       canvas.add(img);
       canvas.setActiveObject(img);
@@ -3173,6 +3302,7 @@
   historyIdx = 0;
 
   initFontGrid();
+  initNumberFontGrid();
   initColorGrid();
   initVariantState();
   findAndUpdateVariant();
